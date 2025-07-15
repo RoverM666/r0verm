@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R0VER.M - Equipo Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Bebas+Neue&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #ffffff;
+            background-color: #0a0a0a;
+            overflow-x: hidden;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            perspective: 1000px;
+        }
+
+        /* Dynamic background */
+        .dynamic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+            z-index: -2;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* Header with animation */
+        header {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #e62429;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transform: translateY(0);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            transform-style: preserve-3d;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-container:hover {
+            transform: scale(1.05) rotateY(10deg);
+        }
+
+        .header-logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #e62429;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(230, 36, 41, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .header-logo:hover {
+            text-shadow: 0 0 20px rgba(230, 36, 41, 0.8);
+            transform: scale(1.05);
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: #a0a0a0;
+            margin-left: 15px;
+            font-style: italic;
+            transition: all 0.3s ease;
+        }
+
+        .logo-container:hover .tagline {
+            color: #e62429;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav ul li {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        nav ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            position: relative;
+            padding: 5px 0;
+            text-transform: uppercase;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+        }
+
+        nav ul li a::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #e62429;
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #e62429;
+            transform: translateY(-3px) rotateX(10deg);
+        }
+
+        nav ul li a:hover::before {
+            width: 100%;
+        }
+
+        /* Hero banner with parallax */
+        .hero-banner {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 0 20px;
+            transform: translateZ(50px);
+            transition: transform 0.5s ease;
+        }
+
+        .hero-title {
+            font-size: 72px;
+            font-family: 'Bebas Neue', sans-serif;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .hero-subtitle {
+            font-size: 24px;
+            color: #cccccc;
+            font-weight: 400;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite 0.5s;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .scroll-indicator:hover {
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .scroll-indicator span {
+            display: block;
+            width: 30px;
+            height: 50px;
+            border: 2px solid #e62429;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .scroll-indicator span::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background-color: #e62429;
+            border-radius: 50%;
+            animation: scroll 2s infinite;
+        }
+
+        /* Main content */
+        .main-container {
+            padding: 100px 0;
+            background-color: #0a0a0a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* Section title */
+        .section-title {
+            font-size: 48px;
+            color: #ffffff;
+            margin-bottom: 80px;
+            text-align: center;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.8s ease;
+        }
+
+        .section-title.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background-color: #e62429;
+            box-shadow: 0 0 15px rgba(230, 36, 41, 0.5);
+        }
+
+        /* Team members - Centered circular design with 3D effects */
+        .integrantes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 80px;
+            margin-top: 60px;
+            perspective: 1000px;
+        }
+
+        .integrante {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: translateY(50px) rotateY(20deg);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .integrante.visible {
+            transform: translateY(0) rotateY(0);
+            opacity: 1;
+        }
+
+        /* Irregular border container */
+        .profile-container {
+            background-color: #1a1a1a;
+            padding: 30px;
+            border-radius: 15px 15px 50px 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid #e62429;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .integrante:hover .profile-container {
+            transform: translateY(-10px) rotateY(10deg);
+            box-shadow: 0 20px 50px rgba(230, 36, 41, 0.8);
+            border-radius: 15px 15px 30px 15px;
+        }
+
+        /* Circular image */
+        .imagen-container {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid #e62429;
+            box-shadow: 0 15px 40px rgba(230, 36, 41, 0.5);
+            margin: 0 auto 25px;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+
+        .integrante:hover .imagen-container {
+            transform: scale(1.1) rotateY(10deg);
+            box-shadow: 0 20px 50px rgba(230, 36, 41, 0.8);
+        }
+
+        .imagen-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .integrante:hover .imagen-container img {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .info {
+            width: 100%;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+        }
+
+        .integrante:hover .info {
+            transform: translateY(-10px);
+        }
+
+        .info h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #ffffff;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .integrante:hover .info h2 {
+            color: #e62429;
+            text-shadow: 0 0 15px rgba(230, 36, 41, 0.7);
+        }
+
+        .info p {
+            font-size: 16px;
+            color: #b0b0b0;
+            margin: 12px 0;
+            transition: all 0.3s ease;
+        }
+
+        .integrante:hover .info p {
+            color: #ffffff;
+            transform: translateX(5px);
+        }
+
+        .info strong {
+            color: #e62429;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .integrante:hover .info strong {
+            text-shadow: 0 0 10px rgba(230, 36, 41, 0.5);
+        }
+
+        /* Floating elements */
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            background-color: rgba(230, 36, 41, 0.1);
+            border-radius: 50%;
+            filter: blur(20px);
+            animation: float 15s infinite linear;
+        }
+
+        /* Footer with wave animation */
+        footer {
+            background-color: #000000;
+            padding: 80px 0 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+     .footer-wave {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;  /* Cambiamos a 100% para cubrir todo el ancho */
+      height: 80px; /* Altura reducida para que sea más delgada */
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="%23e62429" opacity=".25"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="%23e62429" opacity=".5"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%23e62429"/></svg>');
+      background-size: 100% 100%; /* Ajustamos para que cubra todo el espacio */
+      background-repeat: no-repeat;
+      transform: rotate(180deg);
+    
+     }
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            text-align: center;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.8s ease;
+        }
+
+        .footer-content.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .footer-logo {
+            font-size: 36px;
+            font-weight: bold;
+            color: #e62429;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            display: inline-block;
+            transition: all 0.5s ease;
+            text-shadow: 0 0 10px rgba(230, 36, 41, 0.5);
+        }
+
+        .footer-logo:hover {
+            transform: scale(1.1) rotate(-5deg);
+            text-shadow: 0 0 20px rgba(230, 36, 41, 0.8);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #e62429;
+            transition: width 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #e62429;
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        .copyright {
+            color: #777777;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+            40% { transform: translateY(-20px) translateX(-50%); }
+            60% { transform: translateY(-10px) translateX(-50%); }
+        }
+
+        @keyframes scroll {
+            0% { transform: translateY(0) translateX(-50%); opacity: 1; }
+            100% { transform: translateY(15px) translateX(-50%); opacity: 0; }
+        }
+
+        @keyframes wave {
+            0% { transform: rotate(180deg) translateX(0); }
+            100% { transform: rotate(180deg) translateX(-50%); }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 1024px) {
+            .hero-title {
+                font-size: 60px;
+            }
+            
+            .integrantes {
+                gap: 60px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            .logo-container {
+                margin-bottom: 15px;
+            }
+
+            nav ul {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero-title {
+                font-size: 48px;
+            }
+
+            .hero-subtitle {
+                font-size: 20px;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .imagen-container {
+                width: 180px;
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-banner {
+                height: 80vh;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .integrantes {
+                gap: 60px;
+            }
+
+            .footer-links {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dynamic-bg"></div>
+    <div class="particles" id="particles-js"></div>
+    
+    <header id="main-header">
+        <div class="header-container">
+            <div class="logo-container">
+                <div class="header-logo">R0VER.M</div>
+                <div class="tagline">Equipo Elite</div>
+            </div>
+            <nav>
+                <ul>
+                   
+                    <li><a href="#integrantes">Integrantes</a></li>
+                    <li><a href="#">:]</a></li>
+                    <li><a href="#">:3</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero-banner" id="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Nuestro Equipo</h1>
+            <p class="hero-subtitle">Los miembros clave detrás de las operaciones especiales R0VER.M</p>
+        </div>
+        <div class="scroll-indicator" onclick="smoothScrollTo('#integrantes')">
+            <span></span>
+        </div>
+    </div>
+
+    <div class="main-container" id="integrantes">
+        <div class="floating-elements" id="floating-elements"></div>
+        <div class="content-wrapper">
+            <h2 class="section-title" id="section-title">Conoce al Equipo</h2>
+            
+            <div class="integrantes">
+                <div class="integrante" id="integrante1">
+                    <div class="profile-container">
+                        <div class="imagen-container">
+                            <img src="yo.jpg" alt="Camila Rojas Sosa">                        </div>
+                        <div class="info">
+                            <h2>Camila Rojas Sosa</h2>
+                            <p><strong>Edad:</strong> 16 años</p>
+                            <p><strong>Teléfono:</strong> +57 310 8205141</p>
+                            <p><strong>Identificación:</strong> 1023528282</p>
+                            <p><strong>Instagram:</strong> @VLUER_XD</p>
+                            :3
+                            </div>
+                    </div>
+                </div>
+                
+                <div class="integrante" id="integrante2">
+                    <div class="profile-container">
+                        <div class="imagen-container">
+                            <img src="KXE.jpg" alt="Daniela Rojas Sosa">
+                        </div>
+                        <div class="info">
+                            <h2>Daniela Rojas Sosa</h2>
+                            <p><strong>Edad:</strong> 16 años</p>
+                            <p><strong>Teléfono:</strong> +57 310 8205112</p>
+                            <p><strong>Identificación:</strong> 1023528283</p>
+                            <p><strong>Instagram:</strong> @K_942XD</p>
+                            :]
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-wave"></div>
+        <div class="footer-content" id="footer-content">
+            <div class="footer-logo">R0VER.M</div>
+            <div class="footer-links">
+                <a href="#">i wish </a>
+                <a href="#">was</a>
+                <a href="#">special</a>
+            </div>
+            <div class="copyright">
+                © 2023 R0VER.M Sistema Militar. que pro q somos BV
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Particles.js configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#e62429"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.3,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 2,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#e62429",
+                        "opacity": 0.2,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 1,
+                        "direction": "none",
+                        "random": true,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": true,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 0.5
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+
+            // Create floating elements
+            const floatingContainer = document.getElementById('floating-elements');
+            for (let i = 0; i < 15; i++) {
+                const element = document.createElement('div');
+                element.classList.add('floating-element');
+                const size = Math.random() * 100 + 50;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const opacity = Math.random() * 0.2 + 0.1;
+                const delay = Math.random() * 15;
+                
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+                element.style.left = `${posX}%`;
+                element.style.top = `${posY}%`;
+                element.style.opacity = opacity;
+                element.style.animationDelay = `${delay}s`;
+                
+                floatingContainer.appendChild(element);
+            }
+
+            // Improved smooth scroll function
+            function smoothScrollTo(target) {
+                const element = document.querySelector(target);
+                if (element) {
+                    const headerHeight = document.getElementById('main-header').offsetHeight;
+                    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+                    const offsetPosition = elementPosition - headerHeight;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+
+            // Keyboard navigation
+            document.addEventListener('keydown', function(event) {
+                const currentScroll = window.pageYOffset;
+                const heroHeight = document.getElementById('hero').offsetHeight;
+                const headerHeight = document.getElementById('main-header').offsetHeight;
+                
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    if (currentScroll < heroHeight - 100) {
+                        // If we're in the hero section, scroll to integrantes
+                        smoothScrollTo('#integrantes');
+                    } else {
+                        // Otherwise scroll to footer
+                        smoothScrollTo('footer');
+                    }
+                }
+                
+                if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    if (currentScroll > heroHeight + 100) {
+                        // If we're below hero section, scroll to integrantes
+                        smoothScrollTo('#integrantes');
+                    } else {
+                        // Otherwise scroll to top
+                        smoothScrollTo('#hero');
+                    }
+                }
+            });
+
+            // Click handler for scroll indicator
+            document.querySelector('.scroll-indicator').addEventListener('click', function() {
+                smoothScrollTo('#integrantes');
+            });
+
+            // Scroll animations
+            function checkVisibility() {
+                const sectionTitle = document.getElementById('section-title');
+                const integrante1 = document.getElementById('integrante1');
+                const integrante2 = document.getElementById('integrante2');
+                const footerContent = document.getElementById('footer-content');
+                
+                const elements = [
+                    { el: sectionTitle, class: 'visible' },
+                    { el: integrante1, class: 'visible' },
+                    { el: integrante2, class: 'visible' },
+                    { el: footerContent, class: 'visible' }
+                ];
+                
+                elements.forEach(item => {
+                    const rect = item.el.getBoundingClientRect();
+                    const isVisible = (rect.top <= window.innerHeight * 0.8) && 
+                                    (rect.bottom >= window.innerHeight * 0.2);
+                    
+                    if (isVisible) {
+                        item.el.classList.add(item.class);
+                    }
+                });
+            }
+            
+            // Header hide/show on scroll
+            let lastScroll = 0;
+            const header = document.getElementById('main-header');
+            
+            window.addEventListener('scroll', function() {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll <= 0) {
+                    header.classList.remove('hidden');
+                    return;
+                }
+                
+                if (currentScroll > lastScroll && !header.classList.contains('hidden')) {
+                    header.classList.add('hidden');
+                } else if (currentScroll < lastScroll && header.classList.contains('hidden')) {
+                    header.classList.remove('hidden');
+                }
+                
+                lastScroll = currentScroll;
+                checkVisibility();
+                
+                // Parallax effect for hero content
+                const heroContent = document.querySelector('.hero-content');
+                const scrollValue = window.pageYOffset;
+                heroContent.style.transform = `translateZ(${50 - scrollValue * 0.1}px)`;
+            });
+            
+            // Initial check
+            checkVisibility();
+        });
+    </script>
+</body>
+</html>

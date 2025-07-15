@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tech Sensors Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e, #0f3460);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(74, 144, 226, 0.3);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .hero {
+            min-height: 100vh;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: slideInDown 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin-bottom: 3rem;
+            animation: slideInUp 1s ease-out 0.3s both;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator::before {
+            content: '';
+            width: 2px;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, #4a90e2);
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        .scroll-indicator::after {
+            content: '↓';
+            color: #4a90e2;
+            font-size: 1.5rem;
+            display: block;
+            text-align: center;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        .sensors-section {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .sensors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+            justify-items: center;
+            align-items: stretch;
+        }
+
+        .sensor-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            cursor: pointer;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .sensor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .sensor-card:hover::before {
+            opacity: 1;
+        }
+
+        .sensor-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            border-color: rgba(74, 144, 226, 0.5);
+        }
+
+        .card-header {
+            height: 250px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .card-image-container {
+            position: relative;
+            width: 70%;
+            height: 70%;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
+            transform: translateZ(40px) scale(1.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Efecto 3D más pronunciado */
+        .card-image-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            transform: translateZ(20px);
+            filter: blur(15px);
+            opacity: 0.7;
+            z-index: -1;
+        }
+
+        .card-image-container::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: 10%;
+            right: 10%;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+            transform: rotateX(75deg) translateZ(30px);
+            transform-origin: bottom;
+            opacity: 0.6;
+            filter: blur(10px);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .ultrasonic {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .metal-detector {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .esp32 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .gps {
+            background: linear-gradient(135deg, #3bff6a 0%, #0a7e3a 100%);
+        }
+
+        .servo {
+            background: linear-gradient(135deg, #ff7b3b 0%, #d93636 100%);
+        }
+
+        .driver {
+            background: linear-gradient(135deg, #a83bff 0%, #5e36d9 100%);
+        }
+
+        .sensor-card:hover .card-image {
+            transform: translateZ(60px) scale(1.15);
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.7));
+        }
+
+        .sensor-card:hover .card-image-container::after {
+            opacity: 0.8;
+            bottom: -50px;
+            filter: blur(15px);
+        }
+
+        .card-content {
+            padding: 30px;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .card-subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .spec-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .spec-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .spec-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .card-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .learn-more-btn {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .learn-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .favorite-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .favorite-btn:hover {
+            color: #ff6b6b;
+            transform: scale(1.2);
+        }
+
+        .favorite-btn.active {
+            color: #ff6b6b;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-bottom: 20px;
+        }
+
+        .modal-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .modal-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #4facfe;
+        }
+
+        .modal-section-content {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .rover-application {
+            background: rgba(79, 172, 254, 0.1);
+            border-left: 4px solid #4facfe;
+        }
+
+        /* Animations */
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translate3d(0, -100%, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translate3d(0, 100%, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .sensors-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .sensors-grid {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+                gap: 30px;
+            }
+
+            .sensor-card {
+                margin: 0;
+            }
+
+            .specs-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .card-header {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+                letter-spacing: 1px;
+            }
+
+            .card-content {
+                padding: 15px;
+            }
+
+            .card-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .learn-more-btn {
+                width: 100%;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .card-header {
+                height: 180px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="hero">
+        <div class="container">
+            <h1>SENSORS</h1>
+            <center><p style="font-size: 1.5rem; margin-top: -1rem; color: rgba(255, 255, 255, 0.7);">(Y COMPONENTES CLAVE)</p></center>
+        </div>
+        <div class="scroll-indicator"></div>
+    </div>
+    </div>
+
+    <section class="sensors-section">
+        <div class="container">
+            <div class="sensors-grid">
+                <!-- ESP32 WROOM -->
+                <div class="sensor-card">
+                    <div class="card-header esp32">
+                        <div class="card-image-container">
+                            <img src="esp32.png" alt="Módulo ESP32 WROOM-DA" class="card-image">
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">ESP32 WROOM-DA Module</h3>
+                        <p class="card-subtitle">Microcontrolador Wi-Fi + Bluetooth</p>
+                        
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <div class="spec-label">CPU</div>
+                                <div class="spec-value">Dual Core</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Flash</div>
+                                <div class="spec-value">4MB</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">RAM</div>
+                                <div class="spec-value">520KB</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">GPIO</div>
+                                <div class="spec-value">34 pines</div>
+                            </div>
+                        </div>
+                        
+                        <p class="card-description">
+                            Potente microcontrolador con conectividad Wi-Fi y Bluetooth integrada. Ideal para proyectos IoT avanzados, domótica y aplicaciones que requieren procesamiento en tiempo real con conectividad inalámbrica de bajo consumo.
+                        </p>
+                        
+                        <div class="card-actions">
+                            <button class="learn-more-btn" data-modal="esp32-modal">Explorar</button>
+                            <button class="favorite-btn">♡</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sensor Ultrasónico -->
+                <div class="sensor-card">
+                    <div class="card-header ultrasonic">
+                        <div class="card-image-container">
+                            <img src="ultrasonic.png" alt="Sensor Ultrasónico HC-SR04" class="card-image">
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Sensor Ultrasónico HC-SR04</h3>
+                        <p class="card-subtitle">Medición de distancia de alta precisión</p>
+                        
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <div class="spec-label">Rango</div>
+                                <div class="spec-value">2cm hasta 400cm.</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Precisión</div>
+                                <div class="spec-value">±3mm</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Voltaje</div>
+                                <div class="spec-value">5V DC</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Frecuencia</div>
+                                <div class="spec-value">40kHz</div>
+                            </div>
+                        </div>
+                        
+                        <p class="card-description">
+                            Sensor de distancia por ultrasonido ideal para evitación de obstáculos, medición de nivel de líquidos y aplicaciones robóticas. Utiliza ondas sonoras para determinar distancias con alta precisión y bajo consumo energético.
+                        </p>
+                        
+                        <div class="card-actions">
+                            <button class="learn-more-btn" data-modal="ultrasonic-modal">Explorar</button>
+                            <button class="favorite-btn">♡</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detector de Metal MDS-60 -->
+                <div class="sensor-card">
+                    <div class="card-header metal-detector">
+                        <div class="card-image-container">
+                            <img src="MDS-60.png" alt="Detector de Metal MDS-60" class="card-image">
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Detector de Metal MDS-60</h3>
+                        <p class="card-subtitle">Detector de metales</p>
+                        
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <div class="spec-label">Profundidad</div>
+                                <div class="spec-value">60cm</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Frecuencia</div>
+                                <div class="spec-value">6.5kHz</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Voltaje</div>
+                                <div class="spec-value">3V a 5V DC</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Bobina</div>
+                                <div class="spec-value">240mm</div>
+                            </div>
+                        </div>
+                        
+                        <p class="card-description">
+                            Detector de metales profesional con alta sensibilidad y profundidad de detección. Ideal para búsqueda de objetos metálicos enterrados, detección de minas, arqueología y aplicaciones de seguridad. Incluye discriminación de metales y ajuste de sensibilidad.
+                        </p>
+                        
+                        <div class="card-actions">
+                            <button class="learn-more-btn" data-modal="metal-modal">Explorar</button>
+                            <button class="favorite-btn">♡</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GPS GY-NEO 6M V2 -->
+                <div class="sensor-card">
+                    <div class="card-header gps">
+                        <div class="card-image-container">
+                            <img src="gps.png" alt="Módulo GPS GY-NEO6MV2" class="card-image">
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">GPS GY-NEO6MV2</h3>
+                        <p class="card-subtitle">Módulo GPS con antena</p>
+                        
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <div class="spec-label">Chipset</div>
+                                <div class="spec-value">NEO-6M</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Frecuencia</div>
+                                <div class="spec-value">1.575GHz</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Voltaje</div>
+                                <div class="spec-value">3.3V-5V</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Precisión</div>
+                                <div class="spec-value">2.5m</div>
+                            </div>
+                        </div>
+                        
+                        <p class="card-description">
+                            Módulo GPS de alta sensibilidad con chipset u-blox NEO-6M. Ideal para aplicaciones de seguimiento, navegación y posicionamiento. Incluye antena patch externa para mejor recepción y memoria EEPROM para almacenar configuración.
+                        </p>
+                        
+                        <div class="card-actions">
+                            <button class="learn-more-btn" data-modal="gps-modal">Explorar</button>
+                            <button class="favorite-btn">♡</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Micro Servo SG90 -->
+                <div class="sensor-card">
+                    <div class="card-header servo">
+                        <div class="card-image-container">
+                            <img src="servo.png" alt="Micro Servo SG90" class="card-image">
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Micro Servo SG90</h3>
+                        <p class="card-subtitle">Servomotor de 9g</p>
+                        
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <div class="spec-label">Torque</div>
+                                <div class="spec-value">1.8kg/cm</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Velocidad</div>
+                                <div class="spec-value">0.12s/60°</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Voltaje</div>
+                                <div class="spec-value">4.8V-6V</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Ángulo</div>
+                                <div class="spec-value">180°</div>
+                            </div>
+                        </div>
+                        
+                        <p class="card-description">
+                            Servomotor mini de bajo costo y peso ligero (9g). Ideal para proyectos de robótica, drones y automatización donde se requiera movimiento controlado en espacios reducidos. Incluye engranajes de plástico y tres cables de control.
+                        </p>
+                        
+                        <div class="card-actions">
+                            <button class="learn-more-btn" data-modal="servo-modal">Explorar</button>
+                            <button class="favorite-btn">♡</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Driver Puente H L298N -->
+                <div class="sensor-card">
+                    <div class="card-header driver">
+                        <div class="card-image-container">
+                            <img src="l2.png" alt="Driver Puente H L298N" class="card-image">
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Driver L298N</h3>
+                        <p class="card-subtitle">Puente H Dual 2A</p>
+                        
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <div class="spec-label">Corriente</div>
+                                <div class="spec-value">2A por canal</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Voltaje</div>
+                                <div class="spec-value">5V-35V</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">Motores</div>
+                                <div class="spec-value">2 DC o 1 paso a paso</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-label">PWM</div>
+                                <div class="spec-value">Soporte</div>
+                            </div>
+                        </div>
+                        
+                        <p class="card-description">
+                            Módulo puente H dual basado en el chip L298N, capaz de controlar dos motores DC o un motor paso a paso. Incluye regulador de voltaje integrado, diodos de protección y permite control de velocidad mediante PWM.
+                        </p>
+                        
+                        <div class="card-actions">
+                            <button class="learn-more-btn" data-modal="driver-modal">Explorar</button>
+                            <button class="favorite-btn">♡</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modals -->
+    <div class="modal" id="esp32-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">ESP32 WROOM-DA Module</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Descripción técnica</h3>
+                    <p class="modal-section-content">
+                        El módulo ESP32 WROOM-DA es un potente microcontrolador con conectividad Wi-Fi y Bluetooth de doble modo (clásico y BLE). Cuenta con un procesador Xtensa® dual-core de 32 bits que puede ser controlado individualmente, con clock frequency ajustable desde 80 MHz hasta 240 MHz.
+                    </p>
+                </div>
+                
+                <div class="modal-section rover-application">
+                    <h3 class="modal-section-title">Aplicación en R0VER.M</h3>
+                    <p class="modal-section-content">
+                        En el robot detector de minas R0VER.M, el ESP32 actuará como el cerebro del sistema, coordinando todos los sensores y actuadores. Sus funciones clave incluyen:
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>Procesamiento de datos de los sensores en tiempo real</li>
+                            <li>Comunicación inalámbrica con la estación base para enviar alertas</li>
+                            <li>Control de los motores y sistema de movimiento</li>
+                            <li>Almacenamiento de patrones de detección para mejorar la precisión</li>
+                            <li>Implementación de algoritmos de navegación autónoma</li>
+                        </ul>
+                    </p>
+                </div>
+                
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Especificaciones adicionales</h3>
+                    <p class="modal-section-content">
+                        <strong>Conectividad:</strong> Wi-Fi 802.11 b/g/n, Bluetooth 4.2 BR/EDR y BLE<br>
+                        <strong>Seguridad:</strong> WPA/WPA2/WPA2-Enterprise/WPS, cifrado hardware AES/SHA2<br>
+                        <strong>Periféricos:</strong> 34 GPIO, 18 canales ADC, 2 DAC, 10 sensores táctiles<br>
+                        <strong>Consumo:</strong> 5μA en modo deep sleep, 100mA en funcionamiento activo
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="ultrasonic-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Sensor Ultrasónico HC-SR04</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Descripción técnica</h3>
+                    <p class="modal-section-content">
+                        El sensor ultrasónico HC-SR04 utiliza ondas sonoras de alta frecuencia (40kHz) para determinar la distancia a objetos. Emite un pulso ultrasónico y mide el tiempo que tarda en recibir el eco, calculando la distancia basada en la velocidad del sonido.
+                    </p>
+                </div>
+                
+                <div class="modal-section rover-application">
+                    <h3 class="modal-section-title">Aplicación en R0VER.M</h3>
+                    <p class="modal-section-content">
+                        En el robot detector de minas R0VER.M, el sensor ultrasónico cumple varias funciones críticas:
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>Detección de obstáculos para navegación segura en terrenos desconocidos</li>
+                            <li>Medición de distancia al suelo para detectar irregularidades o hoyos</li>
+                            <li>Asistencia en el mapeo del terreno circundante</li>
+                            <li>Detección de objetos metálicos grandes cuando se combina con el sensor de metales</li>
+                            <li>Prevención de colisiones con objetos no metálicos que el detector de metales no podría identificar</li>
+                        </ul>
+                    </p>
+                </div>
+                
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Especificaciones adicionales</h3>
+                    <p class="modal-section-content">
+                        <strong>Ángulo de detección:</strong> 15°<br>
+                        <strong>Temperatura de operación:</strong> -15°C a 70°C<br>
+                        <strong>Dimensiones:</strong> 45mm x 20mm x 15mm<br>
+                        <strong>Consumo:</strong> 15mA durante la medición
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="metal-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Detector de Metal MDS-60</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Descripción técnica</h3>
+                    <p class="modal-section-content">
+                        El detector de metales MDS-60 es un equipo profesional diseñado para la detección profunda de objetos metálicos. Utiliza tecnología de inducción electromagnética con una frecuencia de trabajo de 6.5kHz, permitiendo alcanzar profundidades de detección de hasta 60cm dependiendo del tamaño y tipo de metal.
+                    </p>
+                </div>
+                
+                <div class="modal-section rover-application">
+                    <h3 class="modal-section-title">Aplicación en R0VER.M</h3>
+                    <p class="modal-section-content">
+                        Como sensor principal del R0VER.M, el MDS-60 tiene las siguientes funciones especializadas:
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>Detección profunda de minas antipersonales y artefactos explosivos enterrados</li>
+                            <li>Discriminación entre diferentes tipos de metales para reducir falsas alarmas</li>
+                            <li>Mapeo detallado de objetos metálicos en el terreno</li>
+                            <li>Detección de fragmentos metálicos de explosiones previas</li>
+                            <li>Análisis de patrones de enterramiento para identificar amenazas potenciales</li>
+                            <li>Operación continua en condiciones adversas de terreno</li>
+                        </ul>
+                    </p>
+                </div>
+                
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Especificaciones adicionales</h3>
+                    <p class="modal-section-content">
+                        <strong>Sensibilidad:</strong> Ajustable, detecta desde monedas hasta objetos grandes<br>
+                        <strong>Discriminación:</strong> Hierro, metales preciosos, metales no ferrosos<br>
+                        <strong>Autonomía:</strong> 8-12 horas de operación continua<br>
+                        <strong>Resistencia:</strong> IP65 (resistente a polvo y agua)<br>
+                        <strong>Temperatura de operación:</strong> -20°C a 60°C<br>
+                        <strong>Peso:</strong> 1.2kg sin cables
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Modals for added cards -->
+    <div class="modal" id="gps-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">GPS GY-NEO6MV2</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Descripción técnica</h3>
+                    <p class="modal-section-content">
+                        El módulo GPS GY-NEO6MV2 utiliza el chipset u-blox NEO-6M, que ofrece un excelente rendimiento de navegación con baja potencia. Incluye una antena patch externa para mejor recepción de señal y memoria EEPROM para almacenar la configuración cuando está apagado.
+                    </p>
+                </div>
+                
+                <div class="modal-section rover-application">
+                    <h3 class="modal-section-title">Aplicación en R0VER.M</h3>
+                    <p class="modal-section-content">
+                        En el robot detector de minas R0VER.M, el módulo GPS proporciona capacidades esenciales de geolocalización:
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>Posicionamiento preciso del robot en campo abierto</li>
+                            <li>Registro de coordenadas de objetos detectados para mapeo posterior</li>
+                            <li>Navegación autónoma entre puntos de interés</li>
+                            <li>Regreso automático a la base cuando se completa la misión</li>
+                            <li>Registro de rutas recorridas para análisis posterior</li>
+                        </ul>
+                    </p>
+                </div>
+                
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Especificaciones adicionales</h3>
+                    <p class="modal-section-content">
+                        <strong>Canales:</strong> 50 canales de adquisición, 22 de seguimiento<br>
+                        <strong>Tiempo de arranque:</strong> 29s (frío), 27s (caliente)<br>
+                        <strong>Velocidad máxima:</strong> 515m/s (1000 nudos)<br>
+                        <strong>Protocolo:</strong> NMEA 0183, RTCM, u-blox binario<br>
+                        <strong>Interfaz:</strong> UART, configurable a 4800-115200 bps<br>
+                        <strong>Consumo:</strong> 67mA durante navegación
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="servo-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Micro Servo SG90</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Descripción técnica</h3>
+                    <p class="modal-section-content">
+                        El micro servo SG90 es un actuador compacto y económico que proporciona control de posición precisa mediante señales PWM. Utiliza engranajes de plástico para reducir peso y tamaño, y es compatible con la mayoría de plataformas de desarrollo como Arduino, Raspberry Pi y ESP32.
+                    </p>
+                </div>
+                
+                <div class="modal-section rover-application">
+                    <h3 class="modal-section-title">Aplicación en R0VER.M</h3>
+                    <p class="modal-section-content">
+                        En el robot detector de minas R0VER.M, los servomotores SG90 cumplen varias funciones importantes:
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>Control de dirección para sistemas de rastreo</li>
+                            <li>Posicionamiento de sensores para escaneo direccional</li>
+                            <li>Activación de mecanismos de marcado de ubicaciones</li>
+                            <li>Control de brazos o herramientas auxiliares</li>
+                            <li>Ajuste fino de la altura de los sensores según el terreno</li>
+                        </ul>
+                    </p>
+                </div>
+                
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Especificaciones adicionales</h3>
+                    <p class="modal-section-content">
+                        <strong>Dimensiones:</strong> 22.2 x 11.8 x 31mm<br>
+                        <strong>Peso:</strong> 9 gramos<br>
+                        <strong>Rango PWM:</strong> 500-2400μs<br>
+                        <strong>Frecuencia PWM:</strong> 50Hz (20ms)<br>
+                        <strong>Temperatura operación:</strong> -30°C a +60°C<br>
+                        <strong>Engranajes:</strong> Nylon reforzado
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="driver-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Driver L298N</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Descripción técnica</h3>
+                    <p class="modal-section-content">
+                        El módulo L298N es un driver de motores de doble puente H que permite controlar dos motores DC bidireccionales o un motor paso a paso unipolar/bipolar. Incluye protección contra sobretensiones y diodos de libre circulación para proteger los componentes.
+                    </p>
+                </div>
+                
+                <div class="modal-section rover-application">
+                    <h3 class="modal-section-title">Aplicación en R0VER.M</h3>
+                    <p class="modal-section-content">
+                        En el robot detector de minas R0VER.M, el driver L298N cumple funciones críticas de control de movimiento:
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>Control de velocidad y dirección de los motores de tracción</li>
+                            <li>Implementación de movimientos precisos mediante PWM</li>
+                            <li>Protección del circuito de control contra picos de corriente</li>
+                            <li>Posibilidad de frenado dinámico de los motores</li>
+                            <li>Control de motores auxiliares para sistemas complementarios</li>
+                        </ul>
+                    </p>
+                </div>
+                
+                <div class="modal-section">
+                    <h3 class="modal-section-title">Especificaciones adicionales</h3>
+                    <p class="modal-section-content">
+                        <strong>Corriente pico:</strong> 3A (2A continuo recomendado)<br>
+                        <strong>Pérdida de potencia:</strong> 25W (con disipador)<br>
+                        <strong>Lógica de control:</strong> 5V TTL compatible<br>
+                        <strong>Regulador integrado:</strong> 5V 500mA (para lógica)<br>
+                        <strong>Protección:</strong> Diodos de libre circulación integrados<br>
+                        <strong>Dimensiones:</strong> 43 x 43 x 26mm
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Favorite button functionality
+        function initializeFavorites() {
+            const favoriteButtons = document.querySelectorAll('.favorite-btn');
+            favoriteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.classList.toggle('active');
+                    this.textContent = this.classList.contains('active') ? '♥' : '♡';
+                    
+                    // Add animation
+                    this.style.transform = 'scale(1.3)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 200);
+                });
+            });
+        }
+
+        // Card hover effects
+        function initializeCardEffects() {
+            const cards = document.querySelectorAll('.sensor-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const angleX = (y - centerY) / 10;
+                    const angleY = (centerX - x) / 10;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) translateY(-15px) scale(1.02)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0) scale(1)';
+                });
+            });
+        }
+
+        // 3D image effects
+        function initializeImage3DEffects() {
+            const cards = document.querySelectorAll('.sensor-card');
+            
+            cards.forEach(card => {
+                const imageContainer = card.querySelector('.card-image-container');
+                
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const angleX = (y - centerY) / 20;
+                    const angleY = (centerX - x) / 20;
+                    
+                    imageContainer.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    imageContainer.style.transform = 'rotateX(0) rotateY(0)';
+                });
+            });
+        }
+
+        // Smooth scrolling
+        function initializeSmoothScroll() {
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            scrollIndicator.addEventListener('click', () => {
+                document.querySelector('.sensors-section').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        // Modal functionality
+        function initializeModals() {
+            // Open modal
+            document.querySelectorAll('.learn-more-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const modalId = this.getAttribute('data-modal');
+                    const modal = document.getElementById(modalId);
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                    
+                    // Button animation
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+            
+            // Close modal
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.modal').classList.remove('active');
+                    document.body.style.overflow = 'auto'; // Re-enable scrolling
+                });
+            });
+            
+            // Close when clicking outside
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            });
+        }
+
+        // Intersection Observer for animations
+        function initializeAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.sensor-card').forEach(card => {
+                observer.observe(card);
+            });
+        }
+
+        // Adjust iframe size
+        function adjustIframeSize() {
+            if (window.self !== window.top) { // Detect if in iframe
+                const contentHeight = document.documentElement.scrollHeight;
+                window.parent.postMessage({
+                    type: 'setIframeHeight',
+                    height: contentHeight
+                }, '*');
+            }
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            initializeFavorites();
+            initializeCardEffects();
+            initializeImage3DEffects();
+            initializeSmoothScroll();
+            initializeModals();
+            initializeAnimations();
+            
+            // Iframe adjustments
+            adjustIframeSize();
+            window.addEventListener('resize', adjustIframeSize);
+        });
+    </script>
+</body>
+</html>

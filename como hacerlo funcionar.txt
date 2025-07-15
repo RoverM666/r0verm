@@ -1,0 +1,9 @@
+como hacerlo funcionar
+cmd
+-cd "c:ubicacion del archivo"
+
+- python -m http.server 8000
+
+Chrome
+
+http://localhost:800/dashboardd.html

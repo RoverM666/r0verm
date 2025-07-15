@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Códigos - Repositorio de Programación</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1C1C1C;
+            color: #FFFFFF;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="1" cy="1" r="0.1" fill="%23e62429" opacity="0.15"/></svg>');
+            background-size: 20px 20px;
+            opacity: 0.05;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            max-width: 1200px;
+            margin: auto;
+            z-index: 1;
+            padding: 40px 30px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 8px;
+            border: 2px solid #e62429;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: bold;
+            color: #e62429;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(230, 36, 41, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #a0a0a0;
+            font-size: 18px;
+            font-style: italic;
+        }
+
+        /* Search Container */
+        .search-container {
+            margin-bottom: 30px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(237, 29, 36, 0.5);
+            text-align: center;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px 20px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #000000;
+            color: #FFFFFF;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #e62429;
+            box-shadow: 0 0 10px rgba(230, 36, 41, 0.3);
+        }
+
+        .add-code-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            background-color: #e62429;
+            color: #FFFFFF;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .add-code-btn:hover {
+            background-color: #B71C1C;
+            transform: scale(1.05);
+        }
+
+        /* Code Grid */
+        .code-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .code-card {
+            background-color: #1C1C1C;
+            border-radius: 8px;
+            padding: 25px;
+            border-left: 4px solid #e62429;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        .code-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+        }
+
+        .code-title {
+            font-size: 1.5rem;
+            color: #e62429;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .code-language {
+            display: inline-block;
+            background-color: rgba(230, 36, 41, 0.3);
+            color: #e62429;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .code-description {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #e6e6e6;
+            font-size: 1.05rem;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        .code-function {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+
+        .code-function h4 {
+            color: #e62429;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .code-function p {
+            color: #e6e6e6;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background-color: #000000;
+            color: #FFFFFF;
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            position: relative;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #333;
+            color: #FFFFFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background-color: #444;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background-color: #4CAF50;
+            color: #FFFFFF;
+        }
+
+        .edit-btn:hover {
+            background-color: #3e8e41;
+            transform: scale(1.05);
+        }
+
+        .delete-btn {
+            background-color: #e62429;
+            color: #FFFFFF;
+        }
+
+        .delete-btn:hover {
+            background-color: #B71C1C;
+            transform: scale(1.05);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1C1C1C;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            border: 2px solid #e62429;
+        }
+
+        .modal h2 {
+            font-size: 28px;
+            color: #e62429;
+            margin-bottom: 20px;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .modal p {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #a0a0a0;
+            font-style: italic;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #e62429;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #000000;
+            color: #FFFFFF;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #e62429;
+            box-shadow: 0 0 10px rgba(230, 36, 41, 0.3);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background-color: #e62429;
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background-color: #B71C1C;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background-color: #333;
+            color: #FFFFFF;
+        }
+
+        .btn-secondary:hover {
+            background-color: #444;
+            transform: scale(1.05);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(237, 29, 36, 0.5);
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: #e62429;
+            margin-bottom: 15px;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            color: #a0a0a0;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .code-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 36px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .code-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .code-language {
+                margin-top: 10px;
+            }
+            
+            .code-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .code-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💻 Códigos</h1>
+            <p>Repositorio de código con explicaciones y funciones</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="🔍 Buscar códigos por título, lenguaje o función..." id="searchInput">
+            <button class="add-code-btn" onclick="checkPassword()">➕ Agregar Nuevo Código</button>
+        </div>
+
+        <div class="code-grid" id="codeGrid">
+            <!-- Los códigos se mostrarán aquí -->
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <h3>🚀 ¡Comienza tu colección de códigos!</h3>
+            <p>Agrega tu primer código para empezar a construir tu repositorio personal</p>
+        </div>
+    </div>
+
+    <!-- Modal para contraseña -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <h2>🔐 Acceso Restringido</h2>
+            <p>Ingresa la contraseña para agregar nuevos códigos</p>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="passwordInput">Contraseña:</label>
+                    <input type="password" id="passwordInput" placeholder="Ingresa la contraseña..." required>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closePasswordModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Verificar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar código -->
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Agregar Nuevo Código</h2>
+            <form id="codeForm">
+                <div class="form-group">
+                    <label for="codeTitle">Título del Código:</label>
+                    <input type="text" id="codeTitle" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="codeLanguage">Lenguaje:</label>
+                    <select id="codeLanguage" required>
+                        <option value="">Selecciona un lenguaje</option>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="Python">Python</option>
+                        <option value="Java">Java</option>
+                        <option value="C++">C++</option>
+                        <option value="C#">C#</option>
+                        <option value="PHP">PHP</option>
+                        <option value="HTML">HTML</option>
+                        <option value="CSS">CSS</option>
+                        <option value="SQL">SQL</option>
+                        <option value="React">React</option>
+                        <option value="Node.js">Node.js</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="codeDescription">Descripción:</label>
+                    <textarea id="codeDescription" placeholder="Describe qué hace este código..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="codeFunction">Función principal:</label>
+                    <textarea id="codeFunction" placeholder="Explica la función principal de este código..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="codeSnippet">Código:</label>
+                    <textarea id="codeSnippet" placeholder="Pega aquí tu código..." required></textarea>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Código</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let codes = [];
+        let editingIndex = -1;
+
+        // Cargar códigos al iniciar (usando variables en memoria)
+        function loadCodes() {
+            // Agregar algunos códigos de ejemplo
+            if (codes.length === 0) {
+                codes = [
+                    {
+                        title: "Función de Validación de Email",
+                        language: "JavaScript",
+                        description: "Función que valida si un email tiene el formato correcto usando expresiones regulares.",
+                        function: "Verificar que un string tenga formato de email válido antes de enviarlo al servidor",
+                        snippet: `function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Ejemplo de uso
+console.log(validateEmail("usuario@ejemplo.com")); // true
+console.log(validateEmail("email-invalido")); // false`,
+                        dateAdded: new Date().toLocaleDateString()
+                    },
+                    {
+                        title: "Calculadora Simple",
+                        language: "Python",
+                        description: "Una calculadora básica que puede realizar operaciones matemáticas fundamentales.",
+                        function: "Realizar operaciones de suma, resta, multiplicación y división de forma segura",
+                        snippet: `def calculadora(num1, num2, operacion):
+    if operacion == '+':
+        return num1 + num2
+    elif operacion == '-':
+        return num1 - num2
+    elif operacion == '*':
+        return num1 * num2
+    elif operacion == '/':
+        if num2 != 0:
+            return num1 / num2
+        else:
+            return "Error: División por cero"
+    else:
+        return "Operación no válida"
+
+# Ejemplo de uso
+resultado = calculadora(10, 5, '+')
+print(f"Resultado: {resultado}")`,
+                        dateAdded: new Date().toLocaleDateString()
+                    }
+                ];
+            }
+            renderCodes();
+        }
+
+        // Mostrar estado vacío
+        function showEmptyState() {
+            const emptyState = document.getElementById('emptyState');
+            const codeGrid = document.getElementById('codeGrid');
+            
+            if (codes.length === 0) {
+                emptyState.style.display = 'block';
+                codeGrid.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                codeGrid.style.display = 'grid';
+            }
+        }
+
+        // Renderizar códigos
+        function renderCodes(filteredCodes = null) {
+            const codeGrid = document.getElementById('codeGrid');
+            const codesToShow = filteredCodes || codes;
+            
+            if (codesToShow.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            codeGrid.style.display = 'grid';
+            document.getElementById('emptyState').style.display = 'none';
+            
+            codeGrid.innerHTML = codesToShow.map((code, index) => `
+                <div class="code-card">
+                    <div class="code-header">
+                        <h3 class="code-title">${code.title}</h3>
+                        <span class="code-language">${code.language}</span>
+                    </div>
+                    
+                    <p class="code-description">${code.description}</p>
+                    
+                    <div class="code-function">
+                        <h4>🎯 Función:</h4>
+                        <p>${code.function}</p>
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(${index})">📋 Copiar</button>
+                        <pre>${escapeHtml(code.snippet)}</pre>
+                    </div>
+                    
+                    <div class="code-actions">
+                        <button class="edit-btn" onclick="checkPasswordForEdit(${index})">✏️ Editar</button>
+                        <button class="delete-btn" onclick="deleteCode(${index})">🗑️ Eliminar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Escapar HTML
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Verificar contraseña para editar
+        function checkPasswordForEdit(index) {
+            document.getElementById('passwordModal').style.display = 'block';
+            document.getElementById('passwordInput').value = '';
+            
+            // Modificar el evento del formulario temporalmente
+            const passwordForm = document.getElementById('passwordForm');
+            passwordForm.onsubmit = function(e) {
+                e.preventDefault();
+                
+                const password = document.getElementById('passwordInput').value;
+                
+                if (password === 'admin123') {
+                    closePasswordModal();
+                    editCode(index);
+                    // Restaurar el evento original
+                    passwordForm.onsubmit = null;
+                } else {
+                    alert('❌ Contraseña incorrecta. Inténtalo de nuevo.');
+                    document.getElementById('passwordInput').value = '';
+                    document.getElementById('passwordInput').focus();
+                }
+            };
+        }
+
+        // Verificar contraseña
+        function checkPassword() {
+            document.getElementById('passwordModal').style.display = 'block';
+            document.getElementById('passwordInput').value = '';
+        }
+
+        // Cerrar modal de contraseña
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        // Manejar formulario de contraseña
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('passwordInput').value;
+            
+            if (password === 'admin123') {
+                closePasswordModal();
+                openModal();
+            } else {
+                alert('❌ Contraseña incorrecta. Inténtalo de nuevo.');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        });
+
+        // Abrir modal
+        function openModal() {
+            document.getElementById('codeModal').style.display = 'block';
+            document.getElementById('modalTitle').textContent = 'Agregar Nuevo Código';
+            document.getElementById('codeForm').reset();
+            editingIndex = -1;
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('codeModal').style.display = 'none';
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('codeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newCode = {
+                title: document.getElementById('codeTitle').value,
+                language: document.getElementById('codeLanguage').value,
+                description: document.getElementById('codeDescription').value,
+                function: document.getElementById('codeFunction').value,
+                snippet: document.getElementById('codeSnippet').value,
+                dateAdded: new Date().toLocaleDateString()
+            };
+
+            if (editingIndex === -1) {
+                codes.push(newCode);
+            } else {
+                codes[editingIndex] = newCode;
+            }
+
+            renderCodes();
+            closeModal();
+        });
+
+        // Editar código
+        function editCode(index) {
+            const code = codes[index];
+            
+            document.getElementById('codeTitle').value = code.title;
+            document.getElementById('codeLanguage').value = code.language;
+            document.getElementById('codeDescription').value = code.description;
+            document.getElementById('codeFunction').value = code.function;
+            document.getElementById('codeSnippet').value = code.snippet;
+            
+            document.getElementById('modalTitle').textContent = 'Editar Código';
+            document.getElementById('codeModal').style.display = 'block';
+            editingIndex = index;
+        }
+
+        // Eliminar código
+        function deleteCode(index) {
+            if (confirm('¿Estás seguro de que quieres eliminar este código?')) {
+                codes.splice(index, 1);
+                renderCodes();
+            }
+        }
+
+        // Copiar código
+        function copyCode(index) {
+            const code = codes[index];
+            navigator.clipboard.writeText(code.snippet).then(() => {
+                alert('¡Código copiado al portapapeles!');
+            });
+        }
+
+        // Búsqueda
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            if (query === '') {
+                renderCodes();
+            } else {
+                const filtered = codes.filter(code => 
+                    code.title.toLowerCase().includes(query) ||
+                    code.language.toLowerCase().includes(query) ||
+                    code.description.toLowerCase().includes(query) ||
+                    code.function.toLowerCase().includes(query)
+                );
+                renderCodes(filtered);
+            }
+        });
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('codeModal');
+            const passwordModal = document.getElementById('passwordModal');
+            
+            if (event.target == modal) {
+                closeModal();
+            }
+            
+            if (event.target == passwordModal) {
+                closePasswordModal();
+            }
+        }
+
+        // Inicializar la aplicación
+        loadCodes();
+    </script>
+</body>
+</html>

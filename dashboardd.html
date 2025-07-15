@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard R0VER.M - Monitoreo en Tiempo Real</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>  
+  :root {
+    --primary-color: #3a0ca3;
+    --secondary-color: #4361ee;
+    --accent-color: #4cc9f0;
+    --background-color: #03071e;
+    --card-bg: #111528;
+    --text-color: #ffffff;
+    --success-color: #06d6a0;
+    --warning-color: #ffd166;
+    --danger-color: #ef476f;
+    --metal-color: #48cae4;
+    --polvora-color: #e76f51;
+    --mina-color: #ef476f;
+    --no-metal-color: #72b01d;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(74, 20, 140, 0.1) 0%, transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(67, 97, 238, 0.1) 0%, transparent 40%);
+}
+
+.dashboard-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+    z-index: 1;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+}
+
+.header {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 5px;
+}
+
+.title-container {
+    display: flex;
+    align-items: center;
+}
+
+.title {
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 10px rgba(76, 201, 240, 0.3);
+}
+
+.title-icon {
+    font-size: 28px;
+    margin-right: 15px;
+    color: var(--accent-color);
+}
+
+.current-stats {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.stat-card {
+    background: linear-gradient(145deg, rgba(20, 30, 70, 0.5), rgba(10, 20, 50, 0.8));
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    z-index: 0;
+}
+
+.stat-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: var(--accent-color);
+    position: relative;
+    z-index: 1;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 5px 0;
+    position: relative;
+    z-index: 1;
+}
+
+.obstaculos .stat-value { color: var(--warning-color); }
+.minas .stat-value { color: var(--mina-color); }
+.metal .stat-value { color: var(--metal-color); }
+.polvora .stat-value { color: var(--polvora-color); }
+
+.stat-label {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    position: relative;
+    z-index: 1;
+}
+
+.chart-container {
+    grid-column: span 1;
+    height: 320px;
+    position: relative;
+}
+
+.chart-title {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+    z-index: 10;
+}
+
+.sensor-gauge {
+    grid-column: span 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.sensor-range {
+    background: linear-gradient(to right, var(--success-color), var(--warning-color), var(--danger-color));
+    height: 12px;
+    border-radius: 20px;
+    position: relative;
+    margin: 20px 0 5px;
+    width: 100%;
+}
+
+.sensor-marker {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    z-index: 2;
+    border: 3px solid var(--background-color);
+    transition: left 0.5s ease;
+}
+
+.sensor-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+}
+
+.update-time {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+}
+
+.update-icon {
+    margin-right: 5px;
+    color: var(--accent-color);
+}
+
+.form-title {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+}
+
+.form-icon {
+    margin-right: 10px;
+    color: var(--accent-color);
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Estilos para los tooltips en gráficos */
+.chartjs-tooltip {
+    background-color: rgba(10, 15, 40, 0.8) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 8px !important;
+    color: white !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Estilos para la tabla de datos */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.data-table th {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.data-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.status-high {
+    color: var(--danger-color);
+    font-weight: bold;
+}
+
+.status-medium {
+    color: var(--warning-color);
+    font-weight: bold;
+}
+
+.status-low {
+    color: var(--success-color);
+}
+
+/* Sistema de notificaciones */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    border-left: 4px solid var(--accent-color);
+    display: flex;
+    align-items: flex-start;
+    max-width: 350px;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-content {
+    margin-left: 15px;
+}
+
+.notification-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.notification-message {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+}
+
+.notification-icon {
+    font-size: 24px;
+    color: var(--accent-color);
+}
+
+.notification-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.notification-close:hover {
+    color: rgba(255,255,255,0.9);
+}
+
+/* Layout responsive */
+@media (max-width: 1200px) {
+    .dashboard-container {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 20px;
+    }
+    .current-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+    .current-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+  </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header card">
+            <div class="title-container">
+                <i class="fas fa-robot title-icon"></i>
+                <h1 class="title">Dashboard R0VER.M</h1>
+            </div>
+            <div class="update-time">
+                <i class="fas fa-sync update-icon"></i>
+                <span id="last-update">--:--:--</span>
+            </div>
+        </div>
+
+        <div class="current-stats">
+            <div class="stat-card obstaculos fade-in">
+                <i class="fas fa-exclamation-triangle stat-icon"></i>
+                <div class="stat-value" id="obstaculos-count">0</div>
+                <div class="stat-label">Obstáculos Detectados</div>
+            </div>
+            <div class="stat-card minas fade-in" style="animation-delay: 0.1s">
+                <i class="fas fa-bomb stat-icon"></i>
+                <div class="stat-value" id="minas-count">0</div>
+                <div class="stat-label">Minas Detectadas</div>
+            </div>
+            <div class="stat-card metal fade-in" style="animation-delay: 0.2s">
+                <i class="fas fa-magnet stat-icon"></i>
+                <div class="stat-value" id="metal-count">0</div>
+                <div class="stat-label">Metales Detectados</div>
+            </div>
+            <div class="stat-card polvora fade-in" style="animation-delay: 0.3s">
+                <i class="fas fa-fire stat-icon"></i>
+                <div class="stat-value" id="polvora-count">0</div>
+                <div class="stat-label">Pólvora Detectada</div>
+            </div>
+        </div>
+        
+        <div class="card sensor-gauge fade-in">
+            <div class="chart-title">Indicador de Obstáculos</div>
+            <canvas id="obstaculosGaugeChart"></canvas>
+            <div class="sensor-range">
+                <div class="sensor-marker" id="obstaculos-marker" style="left: 50%"></div>
+            </div>
+            <div class="sensor-labels">
+                <span>Sin obstáculos</span>
+                <span>Muchos obstáculos</span>
+            </div>
+        </div>
+
+        <div class="card chart-container fade-in" style="animation-delay: 0.2s">
+            <div class="chart-title">Detecciones por Tiempo</div>
+            <canvas id="deteccionesLineChart"></canvas>
+        </div>
+
+        <div class="card chart-container fade-in" style="animation-delay: 0.3s">
+            <div class="chart-title">Tipos de Detecciones</div>
+            <canvas id="tiposBarChart"></canvas>
+        </div>
+
+        <div class="card chart-container fade-in" style="animation-delay: 0.4s">
+            <div class="chart-title">Distribución de Minas</div>
+            <canvas id="minasChart"></canvas>
+        </div>
+
+        <div class="card chart-container fade-in" style="animation-delay: 0.5s">
+            <div class="chart-title">Relación Metal/Pólvora</div>
+            <canvas id="relacionChart"></canvas>
+        </div>
+        
+        <div class="card chart-container fade-in" style="animation-delay: 0.6s">
+            <div class="chart-title">Distribución de Detecciones</div>
+            <canvas id="distribucionPieChart"></canvas>
+        </div>
+        
+        <!-- Gráfica para tipos de minas: metal vs plástico/no metal -->
+        <div class="card chart-container fade-in" style="animation-delay: 0.7s">
+            <div class="chart-title">Tipos de Minas: Metal vs No Metal</div>
+            <canvas id="tipoMinasChart"></canvas>
+        </div>
+
+        <!-- Gráfica para el mapa de calor -->
+        <div class="card chart-container fade-in" style="animation-delay: 0.8s">
+            <div class="chart-title">Mapa de Calor de Detecciones</div>
+            <canvas id="mapaCalorChart"></canvas>
+        </div>
+
+        <!-- Gráfica para correlación obstáculos-minas -->
+        <div class="card chart-container fade-in" style="animation-delay: 0.9s">
+            <div class="chart-title">Correlación Obstáculos-Minas</div>
+            <canvas id="correlacionChart"></canvas>
+        </div>
+
+        <!-- Gráfica para tendencias temporales -->
+        <div class="card chart-container fade-in" style="animation-delay: 1.0s">
+            <div class="chart-title">Tendencias Temporales</div>
+            <canvas id="tendenciasChart"></canvas>
+        </div>
+
+        <!-- Gráfica para análisis multivariable -->
+        <div class="card chart-container fade-in" style="animation-delay: 1.1s">
+            <div class="chart-title">Análisis Multivariable</div>
+            <canvas id="radarChart"></canvas>
+        </div>
+      
+        <!-- Tabla de datos recientes -->
+        <div class="card fade-in" style="animation-delay: 0.8s; grid-column: 1 / -1;">
+            <h2 class="form-title"><i class="fas fa-table form-icon"></i>Datos Recientes</h2>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>GPS</th>
+                            <th>Obstáculos</th>
+                            <th>Pólvora</th>
+                            <th>Metal</th>
+                            <th>Mina</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-data">
+                        <tr>
+                            <td colspan="7">Cargando datos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sistema de notificaciones -->
+    <div class="notification" id="notification">
+        <i class="fas fa-info-circle notification-icon"></i>
+        <div class="notification-content">
+            <div class="notification-title">Título de la notificación</div>
+            <div class="notification-message" id="notification-message">Mensaje de la notificación</div>
+        </div>
+        <div class="notification-close" onclick="closeNotification()">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+
+<script>
+ document.addEventListener('DOMContentLoaded', function() {
+    // URL de la hoja de cálculo en formato CSV
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRMSGHq3hm1M-BJcqOlFMEQ0TjOW2gbDvEB0Mz6l7ocPmRH2fonMGvzkk54Dc5XQ0QA-mAbhDfirzbb/pub?output=csv';
+    
+    // Variables para almacenar datos
+    let allData = [];
+    let charts = {};
+    
+    // Inicializar gráficos
+    initCharts();
+    
+    // Cargar datos iniciales
+    loadData();
+    
+    // Configurar intervalo para actualizar datos cada 60 segundos
+    setInterval(loadData, 60000);
+    
+    // Función para cargar datos desde la hoja de cálculo
+    function loadData() {
+        fetch(sheetUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta de la red: ' + response.status);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log("Datos recibidos:", data.substring(0, 100)); // Log para depuración
+                const rows = parseCSV(data);
+                
+                // Guardar todos los datos
+                allData = rows;
+                
+                // Actualizar la interfaz con los datos
+                updateDashboard(rows);
+                
+                // Actualizar la hora de la última actualización
+                const now = new Date();
+                document.getElementById('last-update').textContent = now.toLocaleTimeString();
+            })
+            .catch(error => {
+                console.error('Error al obtener datos:', error);
+                showNotification('Error', 'No se pudieron cargar los datos: ' + error.message, 'error');
+            });
+    }
+    
+    // Función para analizar datos CSV
+    function parseCSV(csvText) {
+        const lines = csvText.split('\n');
+        return lines.map(line => {
+            // Manejar comas dentro de campos entre comillas
+            let inQuotes = false;
+            let currentField = '';
+            let fields = [];
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    fields.push(currentField);
+                    currentField = '';
+                } else {
+                    currentField += char;
+                }
+            }
+            
+            fields.push(currentField); // Añadir el último campo
+            return fields;
+        }).filter(row => row.some(field => field.trim() !== '')); // Eliminar filas vacías
+    }
+    
+    // Función para actualizar el dashboard con los datos
+    function updateDashboard(rows) {
+        if (rows.length <= 1) {
+            console.log("No hay suficientes datos para mostrar");
+            return;
+        }
+        
+        // Extraer datos relevantes (omitir la fila de encabezado)
+        const dataRows = rows.slice(1);
+        
+        // Contar detecciones
+        let obstaculosCount = 0;
+        let minasCount = 0;
+        let metalCount = 0;
+        let polvoraCount = 0;
+        
+        dataRows.forEach(row => {
+            // Índices basados en la estructura de la hoja de cálculo
+            const obstaculos = parseInt(row[3]) || 0;
+            const polvora = row[4] || '';
+            const metal = row[5] || '';
+            const mina = row[6] || '';
+            
+            if (obstaculos > 0) obstaculosCount++;
+            if (mina.toLowerCase().includes('si')) minasCount++;
+            if (metal.toLowerCase().includes('si')) metalCount++;
+            if (polvora.toLowerCase().includes('si')) polvoraCount++;
+        });
+        
+        // Actualizar contadores
+        document.getElementById('obstaculos-count').textContent = obstaculosCount;
+        document.getElementById('minas-count').textContent = minasCount;
+        document.getElementById('metal-count').textContent = metalCount;
+        document.getElementById('polvora-count').textContent = polvoraCount;
+        
+        // Actualizar marcador de obstáculos
+        const maxObstaculos = 100;
+        const avgObstaculos = dataRows.reduce((sum, row) => sum + (parseInt(row[3]) || 0), 0) / dataRows.length;
+        const obstaculosPercentage = (avgObstaculos / maxObstaculos) * 100;
+        document.getElementById('obstaculos-marker').style.left = `${obstaculosPercentage}%`;
+        
+        // Actualizar tabla de datos recientes
+        updateRecentDataTable(dataRows.slice(-10)); // Mostrar los últimos 10 registros
+        
+        // Actualizar gráficos
+        updateCharts(dataRows);
+    }
+    
+    // Función para actualizar la tabla de datos recientes
+    function updateRecentDataTable(recentData) {
+        if (!recentData || recentData.length === 0) {
+            document.getElementById('recent-data').innerHTML = 
+                '<tr><td colspan="7">No hay datos disponibles</td></tr>';
+            return;
+        }
+        
+        // Invertir para mostrar los más recientes primero
+        recentData = recentData.reverse();
+        
+        const tableRows = recentData.map(row => {
+            // Crear clases de estado para ciertas columnas
+            let rowHtml = '<tr>';
+            
+            // Fecha/Hora
+            rowHtml += `<td>${row[0] || ''}</td>`;
+            
+            // GPS
+            rowHtml += `<td>${row[2] || ''}</td>`;
+            
+            // Obstáculos
+            const obstaculosValue = parseInt(row[3]) || 0;
+            let obstaculosClass = '';
+            if (obstaculosValue > 70) {
+                obstaculosClass = 'class="status-high"';
+            } else if (obstaculosValue > 30) {
+                obstaculosClass = 'class="status-medium"';
+            } else {
+                obstaculosClass = 'class="status-low"';
+            }
+            rowHtml += `<td ${obstaculosClass}>${obstaculosValue}</td>`;
+            
+            // Pólvora
+            let polvoraClass = '';
+            if (row[4] && row[4].toLowerCase().includes('si')) {
+                polvoraClass = 'class="status-high"';
+            } else if (row[4] && row[4].toLowerCase().includes('posible')) {
+                polvoraClass = 'class="status-medium"';
+            }
+            rowHtml += `<td ${polvoraClass}>${row[4] || ''}</td>`;
+            
+            // Metal
+            let metalClass = '';
+            if (row[5] && row[5].toLowerCase().includes('si')) {
+                metalClass = 'class="status-high"';
+            } else if (row[5] && row[5].toLowerCase().includes('posible')) {
+                metalClass = 'class="status-medium"';
+            }
+            rowHtml += `<td ${metalClass}>${row[5] || ''}</td>`;
+            
+            // Mina
+            let minaClass = '';
+            if (row[6] && row[6].toLowerCase().includes('si')) {
+                minaClass = 'class="status-high"';
+            } else if (row[6] && row[6].toLowerCase().includes('posible')) {
+                minaClass = 'class="status-medium"';
+            }
+            rowHtml += `<td ${minaClass}>${row[6] || ''}</td>`;
+            
+            // Tipo
+            rowHtml += `<td>${row[7] || ''}</td>`;
+            
+            rowHtml += '</tr>';
+            return rowHtml;
+        }).join('');
+        
+        document.getElementById('recent-data').innerHTML = tableRows || 
+            '<tr><td colspan="7">No hay datos disponibles</td></tr>';
+    }
+    
+    // Función para inicializar los gráficos
+    function initCharts() {
+        // Configuración común para todos los gráficos
+        Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
+        Chart.defaults.font.family = "'Montserrat', 'Arial', sans-serif";
+        
+        // Gráfico de gauge para obstáculos
+        const obstaculosGaugeCtx = document.getElementById('obstaculosGaugeChart').getContext('2d');
+        charts.obstaculosGauge = new Chart(obstaculosGaugeCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [0, 100],
+                    backgroundColor: [
+                        'rgba(76, 201, 240, 0.8)',
+                        'rgba(10, 20, 50, 0.3)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                circumference: 180,
+                rotation: 270,
+                cutout: '80%',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: true
+                }
+            }
+        });
+        
+        // Gráfico de línea para detecciones por tiempo
+        const deteccionesLineCtx = document.getElementById('deteccionesLineChart').getContext('2d');
+        charts.deteccionesLine = new Chart(deteccionesLineCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Obstáculos',
+                        data: [],
+                        borderColor: 'rgba(255, 209, 102, 1)',
+                        backgroundColor: 'rgba(255, 209, 102, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Minas',
+                        data: [],
+                        borderColor: 'rgba(239, 71, 111, 1)',
+                        backgroundColor: 'rgba(239, 71, 111, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfico de barras para tipos de detecciones
+        const tiposBarCtx = document.getElementById('tiposBarChart').getContext('2d');
+        charts.tiposBar = new Chart(tiposBarCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Obstáculos', 'Pólvora', 'Metal', 'Minas'],
+                datasets: [{
+                    label: 'Cantidad',
+                    data: [0, 0, 0, 0],
+                    backgroundColor: [
+                        'rgba(255, 209, 102, 0.7)',
+                        'rgba(231, 111, 81, 0.7)',
+                        'rgba(72, 202, 228, 0.7)',
+                        'rgba(239, 71, 111, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 209, 102, 1)',
+                        'rgba(231, 111, 81, 1)',
+                        'rgba(72, 202, 228, 1)',
+                        'rgba(239, 71, 111, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfico para distribución de minas
+        const minasCtx = document.getElementById('minasChart').getContext('2d');
+        charts.minas = new Chart(minasCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Confirmadas', 'Posibles', 'Descartadas'],
+                datasets: [{
+                    data: [0, 0, 0],
+                    backgroundColor: [
+                        'rgba(239, 71, 111, 0.7)',
+                        'rgba(255, 209, 102, 0.7)',
+                        'rgba(6, 214, 160, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(239, 71, 111, 1)',
+                        'rgba(255, 209, 102, 1)',
+                        'rgba(6, 214, 160, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfico para relación metal/pólvora
+        const relacionCtx = document.getElementById('relacionChart').getContext('2d');
+        charts.relacion = new Chart(relacionCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Metal y Pólvora',
+                    data: [],
+                    backgroundColor: 'rgba(76, 201, 240, 0.7)',
+                    borderColor: 'rgba(76, 201, 240, 1)',
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `GPS: ${context.raw.gps}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Metal'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Pólvora'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfico de distribución de detecciones
+        const distribucionCtx = document.getElementById('distribucionPieChart').getContext('2d');
+        charts.distribucion = new Chart(distribucionCtx, {
+            type: 'polarArea',
+            data: {
+                labels: ['Obstáculos', 'Pólvora', 'Metal', 'Minas'],
+                datasets: [{
+                    data: [0, 0, 0, 0],
+                    backgroundColor: [
+                        'rgba(255, 209, 102, 0.7)',
+                        'rgba(231, 111, 81, 0.7)',
+                        'rgba(72, 202, 228, 0.7)',
+                        'rgba(239, 71, 111, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 209, 102, 1)',
+                        'rgba(231, 111, 81, 1)',
+                        'rgba(72, 202, 228, 1)',
+                        'rgba(239, 71, 111, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // NUEVA GRÁFICA: Distribución de Minas por Material (Metálicas vs No Metálicas/Plásticas)
+        const tipoMinasCtx = document.getElementById('tipoMinasChart').getContext('2d');
+        charts.tipoMinas = new Chart(tipoMinasCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Metálicas', 'No Metálicas/Plásticas'],
+                datasets: [{
+                    data: [0, 0],
+                    backgroundColor: [
+                        'rgba(72, 202, 228, 0.7)',  // Color azul para metálicas
+                        'rgba(155, 89, 182, 0.7)'   // Color púrpura para no metálicas
+                    ],
+                    borderColor: [
+                        'rgba(72, 202, 228, 1)',
+                        'rgba(155, 89, 182, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribución por Material',
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        font: {
+                            size: 16
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfico de radar para análisis multivariable
+        const radarCtx = document.getElementById('radarChart').getContext('2d');
+        charts.radar = new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Obstáculos', 'Minas', 'Metal', 'Pólvora', 'Terreno Difícil'],
+                datasets: [{
+                    label: 'Detecciones Actuales',
+                    data: [0, 0, 0, 0, 0],
+                    backgroundColor: 'rgba(76, 201, 240, 0.2)',
+                    borderColor: 'rgba(76, 201, 240, 0.8)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(76, 201, 240, 1)',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            backdropColor: 'transparent',
+                            color: 'rgba(255, 255, 255, 0.7)'
+                        },
+                        pointLabels: {
+                            color: 'rgba(255, 255, 255, 0.7)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.7)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfico para mapa de calor (simulado)
+        const mapaCalorCtx = document.getElementById('mapaCalorChart').getContext('2d');
+        charts.mapaCalor = new Chart(mapaCalorCtx, {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Minas',
+                    data: [],
+                    backgroundColor: 'rgba(239, 71, 111, 0.7)',
+                    borderColor: 'rgba(239, 71, 111, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Obstáculos',
+                    data: [],
+                    backgroundColor: 'rgba(255, 209, 102, 0.7)',
+                    borderColor: 'rgba(255, 209, 102, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Metal',
+                    data: [],
+                    backgroundColor: 'rgba(72, 202, 228, 0.7)',
+                    borderColor: 'rgba(72, 202, 228, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        min: 0,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Coordenada X'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Coordenada Y'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label} en (${context.raw.x.toFixed(1)}, ${context.raw.y.toFixed(1)})`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfico para correlación obstáculos-minas
+        const correlacionCtx = document.getElementById('correlacionChart').getContext('2d');
+        charts.correlacion = new Chart(correlacionCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Correlación',
+                    data: [],
+                    backgroundColor: 'rgba(106, 90, 205, 0.7)',
+                    borderColor: 'rgba(106, 90, 205, 1)',
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Obstáculos: ${context.raw.x}, Probabilidad mina: ${context.raw.y.toFixed(2)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Nivel de Obstáculos'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Probabilidad de Mina'
+                        },
+                        min: 0,
+                        max: 1,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfico para tendencias temporales
+        const tendenciasCtx = document.getElementById('tendenciasChart').getContext('2d');
+        charts.tendencias = new Chart(tendenciasCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Tendencia de Minas',
+                        data: [],
+                        borderColor: 'rgba(239, 71, 111, 1)',
+                        backgroundColor: 'rgba(239, 71, 111, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderDash: []
+                    },
+                    {
+                        label: 'Línea de Tendencia',
+                        data: [],
+                        borderColor: 'rgba(255, 255, 255, 0.8)',
+                        backgroundColor: 'transparent',
+                        tension: 0,
+                        fill: false,
+                        borderDash: [5, 5],
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Función para actualizar los gráficos con nuevos datos
+    function updateCharts(dataRows) {
+        if (!dataRows || dataRows.length === 0) return;
+        
+        // Datos para gráficos
+        let obstaculosCount = 0;
+        let minasCount = 0;
+        let metalCount = 0;
+        let polvoraCount = 0;
+        
+        let minasConfirmadas = 0;
+        let minasPosibles = 0;
+        let minasDescartadas = 0;
+        
+        // Variables para la nueva gráfica
+        let minasMetalicas = 0;
+        let minasNoMetalicas = 0;
+        
+        // Datos para gráfico de línea (últimos 10 registros)
+        const lastEntries = dataRows.slice(-10);
+        const labels = lastEntries.map(row => {
+            // Extraer solo la hora de la marca temporal
+            const timestamp = row[0] || '';
+            const timePart = timestamp.split(' ')[1] || timestamp;
+            return timePart;
+        });
+        
+        const obstaculosData = lastEntries.map(row => parseInt(row[3]) || 0);
+        const minasData = lastEntries.map(row => {
+            const mina = row[6] || '';
+            if (mina.toLowerCase().includes('si')) return 1;
+            if (mina.toLowerCase().includes('posible')) return 0.5;
+            return 0;
+        });
+        
+        // Datos para gráfico de dispersión
+        const scatterData = dataRows.map(row => {
+            const metal = row[5] || '';
+            const polvora = row[4] || '';
+            
+            // Convertir valores de texto a numéricos para el gráfico
+            let metalValue = 0;
+            if (metal.toLowerCase().includes('si')) metalValue = 1;
+            else if (metal.toLowerCase().includes('posible')) metalValue = 0.5;
+            
+            let polvoraValue = 0;
+            if (polvora.toLowerCase().includes('si')) polvoraValue = 1;
+            else if (polvora.toLowerCase().includes('posible')) polvoraValue = 0.5;
+            
+            return {
+                x: metalValue,
+                y: polvoraValue,
+                gps: row[2] || 'No disponible'
+            };
+        });
+        
+        // Datos para el mapa de calor (simulados desde coordenadas GPS)
+        const mapaCalorData = {
+            minas: [],
+            obstaculos: [],
+            metal: []
+        };
+        
+        // Datos para la correlación obstáculos-minas
+        const correlacionData = [];
+        const obstaculosRanges = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+        
+        // Para cada rango de obstáculos, calcular la probabilidad de encontrar minas
+        obstaculosRanges.forEach(range => {
+            // Filtrar datos para este rango
+            const rangeData = dataRows.filter(row => {
+                const obstaculos = parseInt(row[3]) || 0;
+                return obstaculos >= range && obstaculos < range + 10;
+            });
+            
+            if (rangeData.length > 0) {
+                const minasEnRango = rangeData.filter(row => {
+                    const mina = row[6] || '';
+                    return mina.toLowerCase().includes('si');
+                }).length;
+                
+                const probabilidad = rangeData.length > 0 ? minasEnRango / rangeData.length : 0;
+                correlacionData.push({
+                    x: range + 5, // Usar el punto medio del rango
+                    y: probabilidad
+                });
+            }
+        });
+        
+        // Simular datos para el mapa de calor
+        dataRows.forEach((row, index) => {
+            const obstaculos = parseInt(row[3]) || 0;
+            const metal = row[5] || '';
+            const mina = row[6] || '';
+            const gps = row[2] || '';
+            
+            // Intentar extraer coordenadas del GPS o usar valores simulados
+            let coordX = 50 + Math.random() * 50 - 25;
+            let coordY = 50 + Math.random() * 50 - 25;
+            
+            // Si tenemos coordenadas GPS, intentar usarlas
+            if (gps && gps.includes(',')) {
+                const parts = gps.split(',');
+                if (parts.length >= 2) {
+                    // Normalizar coordenadas (muy simplificado para este ejemplo)
+                    coordX = parseFloat(parts[0]) % 100;
+                    coordY = parseFloat(parts[1]) % 100;
+                }
+            }
+            
+            // Tamaño de la burbuja proporcional al nivel de detección
+            const bubbleSize = 5 + (obstaculos / 10);
+            
+            if (mina.toLowerCase().includes('si')) {
+                mapaCalorData.minas.push({
+                    x: coordX,
+                    y: coordY,
+                    r: bubbleSize
+                });
+            } else if (obstaculos > 50) {
+                mapaCalorData.obstaculos.push({
+                    x: coordX,
+                    y: coordY,
+                    r: bubbleSize
+                });
+            } else if (metal.toLowerCase().includes('si')) {
+                mapaCalorData.metal.push({
+                    x: coordX,
+                    y: coordY,
+                    r: bubbleSize
+                });
+            }
+        });
+        
+        // Contar detecciones
+        dataRows.forEach(row => {
+            const obstaculos = parseInt(row[3]) || 0;
+            const polvora = row[4] || '';
+            const metal = row[5] || '';
+            const mina = row[6] || '';
+            const tipo = row[7] || '';
+            
+            if (obstaculos > 0) obstaculosCount++;
+            if (polvora.toLowerCase().includes('si')) polvoraCount++;
+            if (metal.toLowerCase().includes('si')) metalCount++;
+            
+            if (mina.toLowerCase().includes('si')) {
+                minasCount++;
+                minasConfirmadas++;
+                
+                // Determinar si la mina es metálica o no metálica
+                if (metal.toLowerCase().includes('si')) {
+                    minasMetalicas++;
+                } else {
+                    minasNoMetalicas++;
+                }
+            } else if (mina.toLowerCase().includes('posible')) {
+                minasPosibles++;
+                
+                // Para minas posibles, también contamos en metálicas o no metálicas
+                if (metal.toLowerCase().includes('si')) {
+                    minasMetalicas += 0.5; // Peso reducido para minas posibles
+                } else if (metal.toLowerCase().includes('posible')) {
+                    minasMetalicas += 0.25; // Peso aún más reducido para metales posibles
+                    minasNoMetalicas += 0.25;
+                } else {
+                    minasNoMetalicas += 0.5;
+                }
+            } else if (mina.toLowerCase().includes('no')) {
+                minasDescartadas++;
+            }
+        });
+        
+        // Actualizar gráfico de gauge
+        const avgObstaculos = dataRows.reduce((sum, row) => sum + (parseInt(row[3]) || 0), 0) / dataRows.length;
+        charts.obstaculosGauge.data.datasets[0].data = [avgObstaculos, 100 - avgObstaculos];
+        charts.obstaculosGauge.update();
+        
+        // Actualizar gráfico de línea
+        charts.deteccionesLine.data.labels = labels;
+        charts.deteccionesLine.data.datasets[0].data = obstaculosData;
+        charts.deteccionesLine.data.datasets[1].data = minasData;
+        charts.deteccionesLine.update();
+        
+        // Actualizar gráfico de barras
+        charts.tiposBar.data.datasets[0].data = [obstaculosCount, polvoraCount, metalCount, minasCount];
+        charts.tiposBar.update();
+        
+        // Actualizar gráfico de minas
+        charts.minas.data.datasets[0].data = [minasConfirmadas, minasPosibles, minasDescartadas];
+        charts.minas.update();
+        
+        // Actualizar gráfico de relación
+        charts.relacion.data.datasets[0].data = scatterData;
+        charts.relacion.update();
+        
+        // Actualizar gráfico de distribución
+        charts.distribucion.data.datasets[0].data = [obstaculosCount, polvoraCount, metalCount, minasCount];
+        charts.distribucion.update();
+        
+        // Actualizar nuevo gráfico de tipos de minas
+        charts.tipoMinas.data.datasets[0].data = [minasMetalicas, minasNoMetalicas];
+        charts.tipoMinas.update();
+        
+        // Actualizar gráfico de mapa de calor
+        charts.mapaCalor.data.datasets[0].data = mapaCalorData.minas;
+        charts.mapaCalor.data.datasets[1].data = mapaCalorData.obstaculos;
+        charts.mapaCalor.data.datasets[2].data = mapaCalorData.metal;
+        charts.mapaCalor.update();
+        
+        // Actualizar gráfico de correlación
+        charts.correlacion.data.datasets[0].data = correlacionData;
+        charts.correlacion.update();
+        
+        // Calcular tendencia de minas
+        const tendenciaLabels = [];
+        const tendenciaData = [];
+        const tendenciaLineaData = [];
+        
+        // Agrupar datos por día para tendencia
+        const diasData = {};
+        dataRows.forEach(row => {
+            const fecha = row[0] ? row[0].split(' ')[0] : 'desconocido';
+            const mina = row[6] || '';
+            
+            if (!diasData[fecha]) {
+                diasData[fecha] = {
+                    total: 0,
+                    minas: 0
+                };
+            }
+            
+            diasData[fecha].total++;
+            if (mina.toLowerCase().includes('si')) {
+                diasData[fecha].minas++;
+            } else if (mina.toLowerCase().includes('posible')) {
+                diasData[fecha].minas += 0.5;
+            }
+        });
+        
+        // Convertir a arrays para el gráfico
+        Object.keys(diasData).forEach(fecha => {
+            tendenciaLabels.push(fecha);
+            const porcentaje = diasData[fecha].total > 0 ? 
+                (diasData[fecha].minas / diasData[fecha].total) * 100 : 0;
+            tendenciaData.push(porcentaje);
+        });
+        
+        // Calcular línea de tendencia (simplificada)
+        if (tendenciaData.length > 1) {
+            const sum = tendenciaData.reduce((a, b) => a + b, 0);
+            const avg = sum / tendenciaData.length;
+            tendenciaLineaData.push(avg);
+            tendenciaLineaData.push(avg);
+        } else if (tendenciaData.length === 1) {
+            tendenciaLineaData.push(tendenciaData[0]);
+            tendenciaLineaData.push(tendenciaData[0]);
+        }
+        
+        // Actualizar gráfico de tendencias
+        charts.tendencias.data.labels = tendenciaLabels;
+        charts.tendencias.data.datasets[0].data = tendenciaData;
+        charts.tendencias.data.datasets[1].data = tendenciaLineaData;
+        charts.tendencias.update();
+        
+        // Actualizar gráfico de radar
+        if (charts.radar) {
+            // Calcular valores para cada categoría
+            const obstaculosAvg = dataRows.reduce((sum, row) => sum + (parseInt(row[3]) || 0), 0) / dataRows.length;
+            const minasCount = dataRows.filter(row => row[6] && row[6].toLowerCase().includes('si')).length;
+            const metalCount = dataRows.filter(row => row[5] && row[5].toLowerCase().includes('si')).length;
+            const polvoraCount = dataRows.filter(row => row[4] && row[4].toLowerCase().includes('si')).length;
+            const terrenoDificil = dataRows.filter(row => row[7] && row[7].toLowerCase().includes('difícil')).length;
+            
+            // Normalizar valores para el gráfico de radar (escala 0-100)
+            const maxValue = dataRows.length;
+            charts.radar.data.datasets[0].data = [
+                (obstaculosAvg / 100) * 100,
+                (minasCount / maxValue) * 100,
+                (metalCount / maxValue) * 100,
+                (polvoraCount / maxValue) * 100,
+                (terrenoDificil / maxValue) * 100
+            ];
+            charts.radar.update();
+        }
+    }
+    
+    // Función para mostrar notificaciones
+    function showNotification(title, message, type = 'info') {
+        const notification = document.getElementById('notification');
+        const notificationMessage = document.getElementById('notification-message');
+        const notificationTitle = notification.querySelector('.notification-title');
+        const notificationIcon = notification.querySelector('.notification-icon');
+        
+        // Establecer contenido
+        notificationTitle.textContent = title;
+        notificationMessage.textContent = message;
+        
+        // Establecer icono según el tipo
+        if (type === 'success') {
+            notificationIcon.className = 'fas fa-check-circle notification-icon';
+            notificationIcon.style.color = 'var(--success-color)';
+        } else if (type === 'error') {
+            notificationIcon.className = 'fas fa-exclamation-circle notification-icon';
+            notificationIcon.style.color = 'var(--danger-color)';
+        } else {
+            notificationIcon.className = 'fas fa-info-circle notification-icon';
+            notificationIcon.style.color = 'var(--accent-color)';
+        }
+        
+        // Mostrar notificación
+        notification.classList.add('show');
+        
+        // Ocultar después de 5 segundos
+        setTimeout(() => {
+            closeNotification();
+        }, 5000);
+    }
+    
+    // Función para cerrar la notificación
+    window.closeNotification = function() {
+        const notification = document.getElementById('notification');
+        notification.classList.remove('show');
+    };
+});
+    </script>
+</body>
+</html>

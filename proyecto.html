@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R0VER.M - Marcando el Peligro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --red: #df0110;
+            --yellow: #fdc500;
+            --blue: #5588a0;
+            --green: #3d5937;
+            --dark: #202020;
+            --light: #f0f0f0;
+            --camouflage: url('camuflado.jpeg');
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Bebas Neue', Impact, sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        /* Secciones fullscreen */
+        .fullscreen-section {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Sección Hero con imagen de fondo MODIFICADA */
+        #hero-section {
+            background: 
+                linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)),
+                var(--camouflage) repeat;
+            background-size: 600px;
+            position: relative;
+            animation: camouflagePan 60s linear infinite;
+        }
+        
+        /* Añadido un mosaico oscuro */
+        #hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.8) 100%),
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px);
+            z-index: 1;
+        }
+        
+        #hero-section .section-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .main-title {
+            font-size: 6rem;
+            margin-bottom: 10px;
+            color: white;
+            text-shadow: 3px 3px 0 var(--red);
+            letter-spacing: 5px;
+            animation: glowingText 3s ease-in-out infinite, pulse 5s ease-in-out infinite;
+            position: relative;
+        }
+        
+        .main-title::before {
+            content: "R0VER.M";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            color: rgba(223, 1, 16, 0.2);
+            filter: blur(8px);
+            z-index: -1;
+            animation: pulse 3s ease-in-out infinite alternate;
+        }
+        
+        .small-slogan {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            animation: fadeInLeft 1.5s ease-out 0.5s both;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: var(--red);
+            color: white;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInRight 1.5s ease-out 1s both;
+            box-shadow: 0 0 10px rgba(223, 1, 16, 0.7);
+        }
+        
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.6s;
+        }
+        
+        .btn:hover {
+            background-color: var(--yellow);
+            color: var(--dark);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(253, 197, 0, 0.5);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        /* Sección Proyecto */
+        #project-section {
+            background-color: var(--dark);
+        }
+        
+        .section-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 50px;
+            color: var(--light);
+            position: relative;
+            opacity: 0;
+            animation: fadeIn 1.5s ease forwards;
+        }
+        
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 4px;
+            background-color: var(--red);
+            animation: expandWidth 1.5s ease-out 0.5s forwards;
+        }
+        
+        @keyframes expandWidth {
+            to { width: 100px; }
+        }
+        
+        /* Sección Logo */
+        #logo-section {
+            background-color: #111;
+        }
+        
+        .logo-container {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255,255,255,0.1);
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .logo-preview {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block !important;
+        }
+        
+        .symbols {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-top: 60px;
+        }
+        
+        .symbol {
+            width: 300px;
+            text-align: center;
+            padding: 30px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+        }
+        
+        .symbol:nth-child(1) {
+            animation: fadeInLeft 1.2s ease-out 0.3s forwards;
+        }
+        
+        .symbol:nth-child(2) {
+            animation: fadeInRight 1.2s ease-out 0.6s forwards;
+        }
+        
+        .symbol::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--red), transparent);
+            animation: rotateGradient 3s linear infinite;
+        }
+        
+        @keyframes rotateGradient {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+        
+        .symbol:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(223, 1, 16, 0.4);
+            background-color: rgba(255,255,255,0.15);
+        }
+        
+        .symbol:hover .symbol-icon {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .symbol-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            animation: floatUpDown 3s ease-in-out infinite;
+        }
+        
+        .explosion {
+            color: var(--red);
+        }
+        
+        .target {
+            color: var(--yellow);
+        }
+        
+        /* Sección Eslogan */
+        #slogan-section {
+            background-color: var(--dark);
+            padding: 80px 20px;
+        }
+        
+        .slogan-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-left: 5px solid var(--red);
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: perspective(800px) rotateY(0deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+            animation: fadeIn 1.5s ease 0.5s forwards;
+        }
+        
+        .slogan-container:hover {
+            transform: perspective(800px) rotateY(5deg);
+            box-shadow: -10px 10px 30px rgba(223, 1, 16, 0.3);
+            background-color: rgba(255,255,255,0.15);
+        }
+        
+        .slogan-text {
+            font-size: 2rem;
+            color: var(--yellow);
+            margin-bottom: 20px;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .slogan-text::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--yellow);
+            transition: width 0.8s ease;
+        }
+        
+        .slogan-container:hover .slogan-text::after {
+            width: 100%;
+        }
+        
+        .slogan-explanation {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1.5s ease 1s forwards;
+        }
+        
+        /* Sección Colores - MODIFICADA para centrar correctamente */
+        #colors-section {
+            background-color: var(--dark);
+            padding: 50px 20px;
+        }
+        
+        .colors-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .colors {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 50px;
+            max-width: 1000px;
+        }
+        
+        .color-card {
+            width: 220px;
+            text-align: center;
+            perspective: 1000px;
+            opacity: 0;
+        }
+        
+        .color-card:nth-child(1) {
+            animation: fadeIn 0.8s ease 0.2s forwards;
+        }
+        
+        .color-card:nth-child(2) {
+            animation: fadeIn 0.8s ease 0.4s forwards;
+        }
+        
+        .color-card:nth-child(3) {
+            animation: fadeIn 0.8s ease 0.6s forwards;
+        }
+        
+        .color-card:nth-child(4) {
+            animation: fadeIn 0.8s ease 0.8s forwards;
+        }
+        
+        .color-card-inner {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .color-card:hover .color-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .color-card-front, .color-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .color-card-front {
+            background-color: var(--dark);
+            border: 2px solid #333;
+        }
+        
+        .color-card-back {
+            background-color: var(--dark);
+            border: 2px solid #333;
+            transform: rotateY(180deg);
+        }
+        
+        .color-swatch {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.5s ease;
+            animation: pulse 3s ease-in-out infinite;
+            position: relative;
+        }
+        
+        .color-swatch::before {
+            content: '';
+            position: absolute;
+            width: 110%;
+            height: 110%;
+            border-radius: 50%;
+            background: transparent;
+            border: 2px solid transparent;
+            top: -5%;
+            left: -5%;
+            animation: rotate 4s linear infinite;
+        }
+        
+        .red::before {
+            border-color: rgba(223, 1, 16, 0.5);
+        }
+        
+        .yellow::before {
+            border-color: rgba(253, 197, 0, 0.5);
+        }
+        
+        .blue::before {
+            border-color: rgba(85, 136, 160, 0.5);
+        }
+        
+        .green::before {
+            border-color: rgba(61, 89, 55, 0.5);
+        }
+        
+        .red {
+            background-color: var(--red);
+        }
+        
+        .yellow {
+            background-color: var(--yellow);
+            color: var(--dark);
+        }
+        
+        .blue {
+            background-color: var(--blue);
+        }
+        
+        .green {
+            background-color: var(--green);
+        }
+        
+        /* Barra de navegación */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0,0,0,0.9);
+            padding: 15px 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--red);
+            transition: all 0.5s ease;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .nav-logo {
+            font-family: 'Bebas Neue', Impact, sans-serif;
+            font-size: 2rem;
+            color: var(--light);
+            text-decoration: none;
+            letter-spacing: 2px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-logo span {
+            color: var(--red);
+            position: relative;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .nav-logo:hover {
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            transform: scale(1.05);
+        }
+        
+        .nav-logo::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--red);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-logo:hover::after {
+            width: 100%;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--red);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--red);
+            transform: translateY(-3px);
+            text-shadow: 0 0 5px rgba(223, 1, 16, 0.5);
+        }
+        
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+        
+        /* Flecha de navegación */
+        .scroll-down {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            z-index: 10;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .scroll-down:hover {
+            color: var(--red);
+            transform: translateX(-50%) scale(1.2);
+            text-shadow: 0 0 15px rgba(223, 1, 16, 0.7);
+        }
+        
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+            40% { transform: translateY(-20px) translateX(-50%); }
+            60% { transform: translateY(-10px) translateX(-50%); }
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes glowingText {
+            0%, 100% { text-shadow: 0 0 5px rgba(223, 1, 16, 0.7), 0 0 10px rgba(223, 1, 16, 0.5); }
+            50% { text-shadow: 0 0 15px rgba(223, 1, 16, 0.9), 0 0 20px rgba(223, 1, 16, 0.7); }
+        }
+        
+        @keyframes camouflagePan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .colors {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .color-card {
+                width: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 4rem;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .symbol {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .color-card {
+                width: 150px;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-links li {
+                margin: 5px 15px;
+            }
+            
+            .slogan-text {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 3rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .logo-container {
+                height: 300px;
+            }
+            
+            .slogan-container {
+                padding: 20px;
+            }
+            
+            .color-card {
+                width: 130px;
+                height: 220px;
+            }
+            
+            .color-card-inner {
+                height: 220px;
+            }
+            
+            .color-swatch {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">R0VER<span>.M</span></a>
+            <ul class="nav-links">
+                <li><a href="#project-section">Proyecto</a></li>
+                <li><a href="#logo-section">Logo</a></li>
+                <li><a href="#slogan-section">Eslogan</a></li>
+                <li><a href="#colors-section">Colores</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Sección Hero con imagen de fondo -->
+    <section id="hero-section" class="fullscreen-section">
+        <div class="section-content">
+            <h1 class="main-title">R0VER.M</h1>
+            <p class="small-slogan">Marcando el Peligro, Asegurando el Futuro</p>
+            <a href="#project-section" class="btn">Ver Proyecto</a>
+        </div>
+        <a href="#project-section" class="scroll-down">
+            <i class="fas fa-chevron-down"></i>
+        </a>
+    </section>
+    
+    <!-- Sección Proyecto -->
+    <section id="project-section" class="fullscreen-section">
+        <div class="section-content">
+            <h2 class="section-title">El Proyecto R0VER.M</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 40px; font-size: 1.2rem;">
+                Nuestra misión es identificar y marcar las zonas de peligro por minas antipersonales, protegiendo a las comunidades y asegurando un futuro más seguro para todos.
+            </p>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto; font-size: 1.1rem;">
+                El proyecto combina tecnología innovadora con un diseño simbólico que representa tanto el peligro como la esperanza de un futuro mejor.
+            </p>
+        </div>
+        <a href="#logo-section" class="scroll-down">
+            <i class="fas fa-chevron-down"></i>
+        </a>
+    </section>
+    
+    <!-- Sección Logo -->
+    <section id="logo-section" class="fullscreen-section">
+        <div class="section-content">
+            <h2 class="section-title">Diseño del Logo</h2>
+            
+            <!-- Espacio dinámico para el logo -->
+            <div class="logo-container">
+                <img class="logo-preview" src="logo.png" alt="logo R0VER.M">
+                <p id="logo-placeholder" style="color: rgba(255,255,255,0.5);"></p>
+            </div>
+            
+            <div class="symbols">
+                <div class="symbol">
+                    <div class="symbol-icon explosion">
+                        <i class="fas fa-explosion"></i>
+                    </div>
+                    <h3>Explosión</h3>
+                    <p>Representa todas aquellas minas antipersonales en nuestro territorio que amenazan la vida de inocentes.</p>
+                </div>
+                <div class="symbol">
+                    <div class="symbol-icon target">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3>Mira</h3>
+                    <p>Simboliza la tensión emocional y la presión constante que se siente al vivir en zonas minadas.</p>
+                </div>
+            </div>
+        </div>
+        <a href="#slogan-section" class="scroll-down">
+            <i class="fas fa-chevron-down"></i>
+        </a>
+    </section>
+    
+    <!-- Sección Eslogan -->
+    <section id="slogan-section" class="fullscreen-section">
+        <div class="section-content">
+            <h2 class="section-title">Nuestro Eslogan</h2>
+            <div class="slogan-container">
+                <div class="slogan-text">"MARCANDO EL PELIGRO, ASEGURANDO EL FUTURO"</div>
+                <div class="slogan-explanation">
+                    Este eslogan sugiere un enfoque a la ubicación de riesgos, la primera parte "MARCANDO EL PELIGRO" implica la identificación de claras amenazas en este caso las minas antipersonas; la segunda parte "ASEGURANDO EL FUTURO" sugiere que al identificar estos riesgos se asegura un mejor futuro y la seguridad de las personas.
+                </div>
+            </div>
+        </div>
+        <a href="#colors-section" class="scroll-down">
+            <i class="fas fa-chevron-down"></i>
+        </a>
+    </section>
+    
+    <!-- Sección Colores MODIFICADA -->
+    <section id="colors-section" class="fullscreen-section">
+        <div class="section-content">
+            <h2 class="section-title">Paleta de Colores</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 40px; font-size: 1.2rem;">
+                Cada color en nuestro diseño representa un aspecto fundamental de nuestra misión y los valores que defendemos.
+            </p>
+            
+            <!-- MODIFICADO: Contenedor centralizado -->
+            <div class="colors-container">
+                <div class="colors">
+                    <div class="color-card">
+                        <div class="color-card-inner">
+                            <div class="color-card-front">
+                                <div class="color-swatch red">ROJO</div>
+                                <h4>Sangre</h4>
+                            </div>
+                            <div class="color-card-back">
+                                <p>Representa la sangre derramada de aquellos inocentes víctimas de las minas antipersonales.</p>
+                                <p style="margin-top: 15px; font-family: monospace;">RGB(223, 1, 16)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-card-inner">
+                            <div class="color-card-front">
+                                <div class="color-swatch yellow">AMARILLO</div>
+                                <h4>Químicos</h4>
+                            </div>
+                            <div class="color-card-back">
+                                <p>Simboliza los componentes químicos y explosivos que hacen estas minas tan peligrosas.</p>
+                                <p style="margin-top: 15px; font-family: monospace;">RGB(253, 197, 0)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-card-inner">
+                            <div class="color-card-front">
+                                <div class="color-swatch blue">AZUL</div>
+                                <h4>Esperanza</h4>
+                            </div>
+                            <div class="color-card-back">
+                                <p>Representa la esperanza que nos impulsa a trabajar por un futuro sin estas amenazas.</p>
+                                <p style="margin-top: 15px; font-family: monospace;">RGB(85, 136, 160)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-card-inner">
+                            <div class="color-card-front">
+                                <div class="color-swatch green">VERDE</div>
+                                <h4>Naturaleza</h4>
+                            </div>
+                            <div class="color-card-back">
+                                <p>Por la naturaleza destruida y los paisajes que no pueden ser disfrutados por el peligro.</p>
+                                <p style="margin-top: 15px; font-family: monospace;">RGB(61, 89, 55)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Función para cargar el logo
+        function loadLogo(imageUrl) {
+            const logoPreview = document.getElementById('logo-preview');
+            const placeholder = document.getElementById('logo-placeholder');
+            
+            if (imageUrl) {
+                logoPreview.src = imageUrl;
+                logoPreview.style.display = 'block';
+                placeholder.style.display = 'none';
+            } else {
+                logoPreview.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+        }
+
+        // Efecto de navbar al hacer scroll
+        window.addEventListener('scroll', function() {
+            const navBar = document.querySelector('.nav-bar');
+            const scrollPosition = window.scrollY;
+            
+            if (scrollPosition > 100) {
+                navBar.style.background = 'rgba(0,0,0,0.95)';
+                navBar.style.padding = '10px 0';
+                navBar.style.boxShadow = '0 5px 15px rgba(0,0,0,0.5)';
+            } else {
+                navBar.style.background = 'rgba(0,0,0,0.9)';
+                navBar.style.padding = '15px 0';
+                navBar.style.boxShadow = '0 2px 10px rgba(0,0,0,0.5)';
+            }
+            
+            // Añadimos animaciones a los elementos cuando se hacen visibles
+            const animateOnScroll = document.querySelectorAll('.section-title, .symbol, .slogan-container, .color-card');
+            
+            animateOnScroll.forEach(elem => {
+                const elemPosition = elem.getBoundingClientRect().top;
+                const screenHeight = window.innerHeight;
+                
+                if (elemPosition < screenHeight * 0.85) {
+                    elem.style.opacity = '1';
+                    elem.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        // Smooth scroll para los enlaces
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+       // Función para añadir efectos de partículas alrededor del cursor 
+document.addEventListener('DOMContentLoaded', function() { 
+    const body = document.querySelector('body'); 
+    
+    // Crear un contenedor para las partículas
+    const particleContainer = document.createElement('div');
+    particleContainer.style.position = 'fixed';
+    particleContainer.style.top = '0';
+    particleContainer.style.left = '0';
+    particleContainer.style.width = '100%';
+    particleContainer.style.height = '100%';
+    particleContainer.style.pointerEvents = 'none';
+    particleContainer.style.zIndex = '9999';
+    body.appendChild(particleContainer);
+    
+    // Función para generar colores aleatorios
+    function getRandomColor() {
+        const colors = ['var(--red)', 'var(--yellow)', 'var(--blue)', 'var(--green)'];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+    
+    body.addEventListener('mousemove', function(e) { 
+        const x = e.clientX; 
+        const y = e.clientY; 
+        
+        const particle = document.createElement('span'); 
+        particle.classList.add('cursor-particle'); 
+        
+        const size = Math.random() * 5 + 3; 
+        const transformValue = Math.random() * 360; 
+        
+        particle.style.width = size + 'px'; 
+        particle.style.height = size + 'px'; 
+        particle.style.top = y + 'px'; 
+        particle.style.left = x + 'px'; 
+        particle.style.background = getRandomColor(); 
+        particle.style.borderRadius = '50%'; 
+        particle.style.position = 'fixed'; 
+        particle.style.pointerEvents = 'none'; 
+        particle.style.transform = 'translate(-50%, -50%) rotate(' + transformValue + 'deg)'; 
+        particle.style.zIndex = '9999'; 
+        particle.style.opacity = '0.7'; 
+        
+        particleContainer.appendChild(particle); 
+        
+        setTimeout(function() { 
+            particle.style.transition = 'all 1s ease'; 
+            particle.style.top = y + (Math.random() * 60 - 30) + 'px'; 
+            particle.style.left = x + (Math.random() * 60 - 30) + 'px'; 
+            particle.style.opacity = '0'; 
+            
+            setTimeout(function() { 
+                particleContainer.removeChild(particle); 
+            }, 500);
+        }, 1500); 
+    });
+});
+</script>
+</body>
+</html>

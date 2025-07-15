@@ -1,0 +1,69 @@
+https://docs.google.com/forms/d/e/1FAIpQLSdVTs9r9ftrPAyh7w51Fc2yVJjOj_PIHiECx51pj5U77Hm13g/viewform?usp=pp_url&entry.1164456257=1&entry.1078468526=2&entry.1200762567=3&entry.1405690062=4&entry.186322890=5&entry.1031703529=6&entry.1954473421=metal
+
+entry: 
+-tiempo= 1164456257
+-gps= 1078468526
+-sensor ultrasonido/obstáculos= 1200762567
+-sensor polvora= 1405690062
+-sensor metal= 186322890
+-mina= 1031703529
+-tiempo(fecha y hora)= 1954473421
+
+hoja de calculo
+https://docs.google.com/spreadsheets/d/1a9ye_m9M5T6ovgCIKo2o2xyRQ-E50WHtikplsbr-T-A/edit?resourcekey=&gid=170547479#gid=170547479
+
+`https://docs.google.com/spreadsheets/d/e/2PACX-1vRMSGHq3hm1M-BJcqOlFMEQ0TjOW2gbDvEB0Mz6l7ocPmRH2fonMGvzkk54Dc5XQ0QA-mAbhDfirzbb/pub?output=csv`
+------------------------
+pines
+
+-pin rueda isq-s (izquierda superior)
+-pin rueda isq-i (isquiersa inferior)
+-pin rueda der-s (derecha superior)
+-pin rueda der-i (derecha inferior)
+
+-pin motor marcador
+-pin potor hilo
+-pin motor sensor
+
+-pin sensor ultrasonido
+-pin sernsor de metales
+-pin sensor de polvora
+-pin gps
+
+------------------------
+
+cada q el sensor ultrasonido detecte "15cm" el robot gire a la derecha con un sistema de frenado para voltear (para girar a la derecha motor isq frenar),y cada q detecte mantar dato a entry obstáculo
+
+cada q el sensor metal detecte valor igual a ( valores de metales utilizados para minas antipersonales) mandar dato a entry sensor metal
+
+cada que el sensor polvora detecte su valor, mandar dato a entry sensor polvora, y haga girar motor marcador por 3sg a la derecha y después girar 3sg a la izquierda 
+  |- cada q se detecte polvora gps mandar dato
+
+------------------------------
+
+el robot avanza de la siguiente manera
+lento
+motor sensor gira 3sg a la derecha -> gira 6sg a la izquierda ->gira 3sg a la dercha (volviendo al estado inicial), mientras los sensores trabajan
+si sensor polvora detectar, motor sensor parar, motor marcador funcionar
+robot avanzar 5sg
+
+si no se detecta nada cuando motor sensor vuelva al estado inicial robot avanzar 5sg
+
+y asi sucesivamente 
+
+----------------------------------
+
+sis. escaleras
+
+se de detecta escalera motor hilo girar a la derecha 5sg
+termina escalera motor hilo girar a la izquierda 5sg
+---------------------------------
+si
+- entry polvora = mina
+- entry sensor metal (si el valor es detectado) + entry sensor polvora = emtry tipo "metal"
+- entry sensor metal (si el valor NO es detectado) + entry sensor polvora = emtry tipo "plástico/no metal"
+
+---------------------------------
+
+//los valores cambiables como tiempos y direcciones deben ser marcados en el codigo
+

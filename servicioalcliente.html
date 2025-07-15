@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R0VER.M Sistema Militar v1.0 - Asistencia al Cliente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto Mono', 'Consolas', monospace;
+            color: #d8e3e7;
+            background: linear-gradient(135deg, #0a1014, #1e2a3a, #252a2e);
+            overflow-x: hidden;
+            cursor: none;
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Military camouflage overlay pattern - refined & more subtle */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(45deg, rgba(40, 55, 40, 0.05) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(40, 55, 40, 0.05) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(40, 55, 40, 0.05) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(40, 55, 40, 0.05) 75%);
+            background-size: 80px 80px; /* Larger pattern blocks */
+            background-position: 0 0, 0 40px, 40px -40px, -40px 0px;
+            z-index: -1;
+            opacity: 0.12;
+        }
+
+        /* Add additional camouflage pattern with different shapes */
+        .main-container::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(rgba(70, 95, 70, 0.03) 15%, transparent 16%),
+                radial-gradient(rgba(40, 65, 40, 0.03) 15%, transparent 16%),
+                radial-gradient(rgba(50, 80, 50, 0.03) 15%, transparent 16%);
+            background-size: 100px 100px;
+            background-position: 0 0, 50px 50px, 25px 75px;
+            z-index: -2;
+            opacity: 0.15;
+        }
+
+        /* Custom cursor */
+        .custom-cursor {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: rgba(120, 200, 90, 0.3);
+            border: 2px solid rgba(120, 200, 90, 0.6);
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            mix-blend-mode: screen;
+            box-shadow: 0 0 10px rgba(120, 200, 90, 0.5);
+        }
+
+        /* Main container */
+        .main-container {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            background-attachment: fixed;
+            padding: 0; /* Eliminar padding superior */
+        }
+
+        .tagline {
+            font-size: 14px;
+            font-style: italic;
+            color: #a0a0a0;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav ul li a {
+            color: #d8e3e7;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 5px 0;
+            letter-spacing: 1px;
+        }
+
+        nav ul li a:hover {
+            color: #78c85a;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #78c85a;
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        /* Military-style container - MODIFICADO PARA PANTALLA COMPLETA */
+        .military-container {
+            background: linear-gradient(145deg, rgba(22, 32, 22, 0.95), rgba(12, 18, 12, 0.95));
+            border-radius: 0; /* Eliminamos el border-radius */
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            border: none; /* Eliminamos el borde */
+            position: relative;
+            width: 100vw; /* Ancho total de la ventana */
+            height: 100vh; /* Alto total de la ventana */
+            margin: 0; /* Sin márgenes */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .military-title-bar {
+            background: linear-gradient(90deg, #436830, #78c85a);
+            color: white;
+            padding: 15px 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .military-container-content {
+            padding: 30px;
+            flex: 1;
+            overflow-y: auto; /* Permitir scroll si el contenido es muy largo */
+        }
+
+        /* Status bar */
+        .status-bar {
+            height: 35px;
+            background: linear-gradient(to right, rgba(16, 24, 16, 0.95), rgba(18, 28, 18, 0.95));
+            display: flex;
+            align-items: center;
+            padding: 0 18px;
+            font-size: 12px;
+            color: #a0a0a0;
+            box-shadow: 0 -3px 15px rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(120, 200, 90, 0.1);
+        }
+
+        .status-item {
+            margin-right: 25px;
+            padding: 4px 12px;
+            background-color: rgba(40, 60, 40, 0.3);
+            border-radius: 4px;
+            font-family: 'Roboto Mono', monospace;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(120, 200, 90, 0.1);
+        }
+
+        /* Grid background overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: linear-gradient(rgba(120, 200, 90, 0.03) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(120, 200, 90, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Scanner effect */
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #78c85a, transparent);
+            animation: scan 3s linear infinite;
+            opacity: 0.6;
+            z-index: 10;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* Servicio al cliente específico */
+        .section-title {
+            font-size: 32px;
+            color: #78c85a;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Orbitron', 'Arial Black', sans-serif;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(120, 200, 90, 0.3);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #78c85a, transparent);
+        }
+
+        .bot-container {
+            background: linear-gradient(145deg, rgba(25, 35, 25, 0.85), rgba(15, 25, 15, 0.85));
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 1px solid rgba(120, 200, 90, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        select, input {
+            background: rgba(10, 20, 10, 0.7);
+            border: 1px solid rgba(120, 200, 90, 0.3);
+            color: #d8e3e7;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-family: 'Roboto Mono', monospace;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        select {
+            background-image: linear-gradient(45deg, transparent 50%, #78c85a 50%),
+                            linear-gradient(135deg, #78c85a 50%, transparent 50%);
+            background-position: calc(100% - 20px) calc(1em + 2px),
+                                calc(100% - 15px) calc(1em + 2px);
+            background-size: 5px 5px,
+                            5px 5px;
+            background-repeat: no-repeat;
+            appearance: none;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #78c85a;
+            box-shadow: 0 0 10px rgba(120, 200, 90, 0.3);
+        }
+
+        .btn-military {
+            background: linear-gradient(145deg, #426830, #386026);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+
+        .btn-military:hover {
+            background: linear-gradient(145deg, #4e7c39, #426830);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-military:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #responseDiv {
+            margin-top: 25px;
+            background: rgba(10, 20, 10, 0.5);
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 150px;
+            border-left: 5px solid #78c85a;
+            font-family: 'Roboto Mono', monospace;
+            line-height: 1.6;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #responseDiv::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, rgba(120, 200, 90, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(120, 200, 90, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        /* Add glitch effect for high-tech feel */
+        @keyframes glitch {
+            0% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(-2px, 2px);
+            }
+            40% {
+                transform: translate(-2px, -2px);
+            }
+            60% {
+                transform: translate(2px, 2px);
+            }
+            80% {
+                transform: translate(2px, -2px);
+            }
+            100% {
+                transform: translate(0);
+            }
+        }
+
+        .header-logo:hover {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+        }
+
+        /* Sparkles y efectos visuales */
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: white;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 100;
+        }
+
+        .description {
+            color: #a0a0a0;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            .logo-container {
+                margin-bottom: 20px;
+            }
+
+            nav ul {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .input-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .content-wrapper {
+                padding: 20px 15px 30px;
+            }
+            
+            .section-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-cursor" id="cursor"></div>
+    
+    <div class="military-container">
+       
+        <div class="scanner-line"></div>
+        <div class="military-container-content">
+            <h1 class="section-title">Asistencia al Cliente R0VER</h1>
+            <p class="description">Ingrese su pregunta sobre el formulario o use la opción de voz (no ingrese tildes).</p>
+            
+            <div class="bot-container">
+                <select id="questionSelect">
+                    <option value="">Selecciona una pregunta...</option>
+                </select>
+                <div class="input-container">
+                    <input type="text" id="userInput" placeholder="Pregunta sobre el formulario">
+                    <button class="btn-military" onclick="startSpeechRecognition()">Hablar</button>
+                    <button class="btn-military" onclick="generateResponse()">Enviar</button>
+                </div>
+                
+                <div id="responseDiv">
+                    <p>El sistema está listo para responder a sus consultas...</p>
+                </div>
+            </div>
+        </div>
+        <div class="status-bar">
+            <div class="status-item">Sistema: Activo</div>
+            <div class="status-item" id="clock">Cargando...</div>
+            <div class="status-item">R0VER.M v1.0.95</div>
+        </div>
+    </div>
+
+    <script>
+       // Custom cursor
+       const cursor = document.getElementById('cursor');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        
+        // Actualizar reloj en tiempo real
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('clock').textContent = timeString;
+        }
+        
+        setInterval(updateClock, 1000);
+        updateClock();
+        
+        // Efecto de sparkle al hacer clic
+        document.addEventListener('click', (e) => {
+            createSparkles(e.clientX, e.clientY);
+            
+            // Aumentar temporalmente el tamaño del cursor
+            cursor.style.width = '50px';
+            cursor.style.height = '50px';
+            cursor.style.backgroundColor = 'rgba(120, 200, 90, 0.5)';
+            
+            setTimeout(() => {
+                cursor.style.width = '24px';
+                cursor.style.height = '24px';
+                cursor.style.backgroundColor = 'rgba(120, 200, 90, 0.3)';
+            }, 300);
+        });
+        
+        // Animar cursor sobre elementos interactivos
+        const interactiveElements = document.querySelectorAll('a, button, select, input, .win95-close-button');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                cursor.style.width = '30px';
+                cursor.style.height = '30px';
+                cursor.style.backgroundColor = 'rgba(120, 200, 90, 0.5)';
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                cursor.style.width = '24px';
+                cursor.style.height = '24px';
+                cursor.style.backgroundColor = 'rgba(120, 200, 90, 0.3)';
+            });
+        });
+        
+        // Crear sparkles
+        function createSparkles(x, y) {
+            const sparkleCount = 8;
+            
+            for (let i = 0; i < sparkleCount; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                document.body.appendChild(sparkle);
+                
+                const angle = (i / sparkleCount) * 360;
+                const distance = 30 + Math.random() * 20;
+                const duration = 500 + Math.random() * 500;
+                
+                const startX = x;
+                const startY = y;
+                const endX = x + Math.cos(angle * Math.PI / 180) * distance;
+                const endY = y + Math.sin(angle * Math.PI / 180) * distance;
+                
+                sparkle.style.left = startX + 'px';
+                sparkle.style.top = startY + 'px';
+                sparkle.style.backgroundColor = i % 2 === 0 ? '#78c85a' : '#a0e080';
+                sparkle.style.opacity = '1';
+                
+                setTimeout(() => {
+                    sparkle.style.transition = `left ${duration}ms ease-out, top ${duration}ms ease-out, opacity ${duration}ms ease-in`;
+                    sparkle.style.left = endX + 'px';
+                    sparkle.style.top = endY + 'px';
+                    sparkle.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        sparkle.remove();
+                    }, duration);
+                }, 10);
+            }
+        }
+
+        let recognition;
+        let isLoading = false;
+
+        // Base de conocimiento extraída de los archivos
+const knowledgeBase = {
+    "¿Cual es el objetivo general del proyecto?": "Crear un robot detector de minas antipersonales para reducir el riesgo humano en operaciones de desminado.",
+ "cual es el objetivo general del proyecto": "Crear un robot detector de minas antipersonales para reducir el riesgo humano en operaciones de desminado.",
+ "objetivo general del proyecto": "Crear un robot detector de minas antipersonales para reducir el riesgo humano en operaciones de desminado.",
+ "objetivo general": "Crear un robot detector de minas antipersonales para reducir el riesgo humano en operaciones de desminado.",
+"objetivo": "Crear un robot detector de minas antipersonales para reducir el riesgo humano en operaciones de desminado.",
+"objetivos": "Crear un robot detector de minas antipersonales para reducir el riesgo humano en operaciones de desminado.",
+    
+"¿Como funciona el robot?": "El robot utiliza sensores de detección como detector de metales y sensor de polvora, además de navegación autónoma y comunicación de datos.",
+"como funciona el robot": "El robot utiliza sensores de detección como detector de metales y sensor de polvora, además de navegación autónoma y comunicación de datos.",
+"Como funciona": "El robot utiliza sensores de detección como detector de metales y sensor de polvora, además de navegación autónoma y comunicación de datos.",
+"como funciona el robot": "El robot utiliza sensores de detección como detector de metales y sensor de polvora, además de navegación autónoma y comunicación de datos.",
+"funcionamiento": "El robot utiliza sensores de detección como detector de metales y sensor de polvora, además de navegación autónoma y comunicación de datos.",
+"como funciona el robot": "El robot utiliza sensores de detección como detector de metales y sensor de polvora, además de navegación autónoma y comunicación de datos.",
+
+    "¿Que sensores utiliza?": "El robot usa detectores de metales , sensor de quimicos, sensores ultrasónicos para detección de obstáculos,  y GPS para mapeo.",
+"que sensores utiliza": "El robot usa detectores de metales, sensr de quimicos, sensores ultrasónicos para detección de obstáculos,  y GPS para mapeo.",
+"sensores utiliza": "El robot usa detectores de metales, sensor de quimicos, sensores ultrasónicos para detección de obstáculos, y GPS para mapeo.",
+"sensores": "El robot usa detectores de metales, sensor de quimicos, sensores ultrasónicos para detección de obstáculos,  y GPS para mapeo.",
+   
+"¿Cual es la estructura del robot?": "Está compuesto por una estructura resistente,con forma de rover, ruedas todoterreno y brazo para los sensores.",
+"cual es la estructura del robot": "Está compuesto por una estructura resistente,con forma de rover, ruedas todoterreno y brazo para los sensores.",
+"estructura del robot": "Está compuesto por una estructura resistente,con forma de rover, ruedas todoterreno y brazo para los sensores.",
+"estructura": "Está compuesto por una estructura resistente,con forma de rover, ruedas todoterreno y brazo para los sensores.",
+
+    "¿Como transmite la informacion?": "Mediante un sistema de comunicación inalámbrica que envía datos de detección a una base de datos.",
+ "como transmite la informacion": "Mediante un sistema de comunicación inalámbrica que envía datos de detección a una base de datos.",
+    "¿Cuál es el cronograma del proyecto?": "El proyecto se divide en con actividades específicas, desde el diseño hasta las pruebas de campo y ajustes finales.",
+"cual es el cronograma del proyecto": "El proyecto se divide en actividades específicas, desde el diseño hasta las pruebas de campo y ajustes finales.",
+"cronograma del proyecto": "El proyecto se divide en actividades específicas, desde el diseño hasta las pruebas de campo y ajustes finales.",
+"cronograma": "El proyecto se divide en actividades específicas, desde el diseño hasta las pruebas de campo y ajustes finales.",
+    "¿Cual es el significado del logo?": "El logo representa una explosión, simbolizando las minas antipersonales, y una mira, reflejando la presión emocional en estas situaciones.",
+ "cual es el significado del logo": "El logo representa una explosión, simbolizando las minas antipersonales, y una mira, reflejando la presión emocional en estas situaciones.",
+ "significado del logo": "El logo representa una explosión, simbolizando las minas antipersonales, y una mira, reflejando la presión emocional en estas situaciones.",
+    "¿Que significa el eslogan?": "‘Marcando el peligro, asegurando el futuro’ significa que identificar los riesgos permite garantizar un futuro más seguro.",
+"que significa el eslogan": "‘Marcando el peligro, asegurando el futuro’ significa que identificar los riesgos permite garantizar un futuro más seguro.",
+"significado del eslogan": "‘Marcando el peligro, asegurando el futuro’ significa que identificar los riesgos permite garantizar un futuro más seguro.",
+
+    "¿Que colores se usan y qué significan?": "Rojo representa la sangre derramada, amarillo los químicos explosivos, azul la esperanza y verde la naturaleza destruida.",
+"que colores se usan y qué significan": "Rojo representa la sangre derramada, amarillo los químicos explosivos, azul la esperanza y verde la naturaleza destruida.",
+"que colores se usan": "Rojo representa la sangre derramada, amarillo los químicos explosivos, azul la esperanza y verde la naturaleza destruida.",
+"¿que significan los colores": "Rojo representa la sangre derramada, amarillo los químicos explosivos, azul la esperanza y verde la naturaleza destruida.",
+"significado de los colores": "Rojo representa la sangre derramada, amarillo los químicos explosivos, azul la esperanza y verde la naturaleza destruida.",
+};
+
+
+
+        // Cargar las preguntas en el menú desplegable
+        function loadQuestions() {
+            const selectElement = document.getElementById('questionSelect');
+            
+            // Limpiar opciones existentes
+            while (selectElement.options.length > 1) {
+                selectElement.remove(1);
+            }
+            
+            // Agregar preguntas del knowledgeBase
+            for (const question in knowledgeBase) {
+                if (question.includes("¿")) { // Solo agregar preguntas formateadas correctamente
+                    const option = document.createElement('option');
+                    option.value = question;
+                    option.textContent = question;
+                    selectElement.appendChild(option);
+                }
+            }
+        }
+
+        // Cargar las preguntas al iniciar la página
+        document.addEventListener('DOMContentLoaded', loadQuestions);
+
+        // Función para generar respuesta
+        function generateResponse() {
+            const userInput = document.getElementById('userInput').value.trim().toLowerCase();
+            const selectedQuestion = document.getElementById('questionSelect').value;
+            const responseDiv = document.getElementById('responseDiv');
+            
+            // Mostrar indicador de carga
+            responseDiv.innerHTML = '<p>Procesando consulta...</p>';
+            isLoading = true;
+            
+            setTimeout(() => {
+                let response = "Lo siento, no tengo información sobre esa consulta específica.";
+                
+                // Verificar si hay una pregunta seleccionada del dropdown
+                if (selectedQuestion && knowledgeBase[selectedQuestion]) {
+                    response = knowledgeBase[selectedQuestion];
+                } 
+                // Si no, buscar en la base de conocimiento por entrada de texto
+                else if (userInput) {
+                    for (const question in knowledgeBase) {
+                        if (question.toLowerCase().includes(userInput) || 
+                            userInput.includes(question.toLowerCase())) {
+                            response = knowledgeBase[question];
+                            break;
+                        }
+                    }
+                }
+                
+                // Mostrar respuesta con efecto de escritura
+                typeWriter(responseDiv, response);
+                isLoading = false;
+            }, 800); // Simular tiempo de procesamiento
+        }
+
+        // Efecto de escritura para la respuesta
+        function typeWriter(element, text, i = 0, speed = 30) {
+            if (i === 0) {
+                element.innerHTML = '';
+            }
+            
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(() => typeWriter(element, text, i, speed), speed);
+            }
+        }
+
+        // Implementación del reconocimiento de voz
+        function startSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                recognition.lang = 'es-ES';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                
+                const userInput = document.getElementById('userInput');
+                const responseDiv = document.getElementById('responseDiv');
+                
+                responseDiv.innerHTML = '<p>Escuchando... Hable ahora.</p>';
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    userInput.value = transcript;
+                    responseDiv.innerHTML = '<p>Procesando: "' + transcript + '"</p>';
+                    
+                    // Generar respuesta automáticamente después de reconocer la voz
+                    setTimeout(generateResponse, 500);
+                };
+                
+                recognition.onerror = function(event) {
+                    responseDiv.innerHTML = '<p>Error en el reconocimiento de voz. Intente de nuevo.</p>';
+                };
+                
+                recognition.start();
+            } else {
+                alert('El reconocimiento de voz no está soportado en este navegador. Intente con Chrome.');
+            }
+        }
+
+        // Manejar evento de cambio en el select
+        document.getElementById('questionSelect').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('userInput').value = this.value;
+                generateResponse();
+            }
+        });
+    </script>
+</body>
+</html>

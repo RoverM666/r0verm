@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bitácora del Proyecto - R0VER.M</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&family=Orbitron:wght@400;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #1C1C1C;
+      color: #FFFFFF;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="1" cy="1" r="0.1" fill="%23e62429" opacity="0.15"/></svg>');
+      background-size: 20px 20px;
+      opacity: 0.05;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      max-width: 1200px;
+      margin: auto;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      padding: 15px 0;
+      position: fixed;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 2px solid #e62429;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 30px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .logo-container:hover {
+      transform: scale(1.05) rotateY(10deg);
+    }
+
+    .header-logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #e62429;
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(230, 36, 41, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: #a0a0a0;
+      margin-left: 15px;
+      font-style: italic;
+      transition: all 0.3s ease;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 25px;
+    }
+
+    nav ul li a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 600;
+      position: relative;
+      padding: 5px 0;
+      text-transform: uppercase;
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 1px;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: inline-block;
+    }
+
+    nav ul li a::before {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: #e62429;
+      transition: width 0.3s ease;
+    }
+
+    nav ul li a:hover {
+      color: #e62429;
+      transform: translateY(-3px) rotateX(10deg);
+    }
+
+    nav ul li a:hover::before {
+      width: 100%;
+    }
+
+    nav ul li a.active {
+      color: #e62429;
+    }
+
+    nav ul li a.active::before {
+      width: 100%;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding-top: 90px;
+      min-height: calc(100vh - 120px);
+    }
+
+    /* Page Sections */
+    .page-section {
+      display: none;
+      padding: 40px 30px;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(237, 29, 36, 0.5);
+      margin-bottom: 30px;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Section Headers */
+    .section-title {
+      font-size: 36px;
+      color: #e62429;
+      margin-bottom: 30px;
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(230, 36, 41, 0.5);
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 80px;
+      height: 3px;
+      background-color: #e62429;
+      box-shadow: 0 0 10px rgba(230, 36, 41, 0.5);
+    }
+
+    /* Form styles */
+    form {
+      background-color: #1C1C1C;
+      padding: 25px 30px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(230, 36, 41, 0.3);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: 700;
+      color: #e62429;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background-color: #000000;
+      color: #FFFFFF;
+      font-size: 1rem;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .file-input-container {
+      position: relative;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .file-input-label {
+      display: inline-block;
+      padding: 12px 20px;
+      background-color: #333;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .file-input-label:hover {
+      background-color: #444;
+    }
+
+    #fileInput {
+      position: absolute;
+      font-size: 100px;
+      right: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-name {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      background-color: #e62429;
+      color: #FFFFFF;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #B71C1C;
+      transform: scale(1.05);
+    }
+
+    /* Table styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #1C1C1C;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    table th, table td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid #444;
+    }
+
+    table th {
+      background-color: #e62429;
+      color: #FFFFFF;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    table td {
+      color: #FFFFFF;
+      vertical-align: middle;
+    }
+
+    .thumbnail {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 2px solid #e62429;
+      transition: all 0.3s ease;
+    }
+
+    .thumbnail:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(230, 36, 41, 0.7);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .edit-btn, .delete-btn {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      border-radius: 4px;
+    }
+
+    .edit-btn {
+      background-color: #4CAF50;
+    }
+
+    .edit-btn:hover {
+      background-color: #3e8e41;
+    }
+
+    .delete-btn {
+      background-color: #e62429;
+    }
+
+    .delete-btn:hover {
+      background-color: #B71C1C;
+    }
+
+    /* Bitácora entries - MEJORADO */
+    .bitacora-entries {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .bitacora-entry {
+      background-color: #1C1C1C;
+      border-radius: 8px;
+      padding: 25px;
+      border-left: 4px solid #e62429;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      animation: slideIn 0.5s ease-out;
+      margin-bottom: 15px;
+    }
+
+    .bitacora-entry:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 15px;
+    }
+
+    .entry-title {
+      font-size: 1.5rem;
+      color: #e62429;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .entry-date {
+      font-size: 0.9rem;
+      color: #999;
+      font-weight: 500;
+    }
+
+    .entry-category {
+      display: inline-block;
+      background-color: rgba(230, 36, 41, 0.2);
+      color: #e62429;
+      padding: 4px 10px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+
+    .entry-content {
+      line-height: 1.8;
+      margin-bottom: 20px;
+      white-space: pre-line; /* Preserva saltos de línea */
+      color: #e6e6e6;
+      font-size: 1.05rem;
+      padding: 0 5px;
+    }
+
+    .entry-content p {
+      margin-bottom: 15px;
+    }
+
+    .entry-media {
+      margin-top: 20px;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #000;
+      padding: 10px;
+      border: 1px solid #333;
+    }
+
+    .entry-media img {
+      width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #000000;
+      padding: 20px 0;
+      text-align: center;
+      border-top: 2px solid #e62429;
+      margin-top: 40px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 30px;
+    }
+
+    .copyright {
+      color: #777777;
+      font-size: 14px;
+    }
+
+    /* Loading animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(230, 36, 41, 0.3);
+      border-radius: 50%;
+      border-top-color: #e62429;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* No data message */
+    .no-data {
+      text-align: center;
+      padding: 30px;
+      color: #777;
+      font-style: italic;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        padding: 10px;
+      }
+
+      .logo-container {
+        margin-bottom: 10px;
+      }
+
+      nav ul {
+        gap: 15px;
+      }
+
+      .main-content {
+        padding-top: 120px;
+      }
+
+      .page-section {
+        padding: 20px 15px;
+      }
+
+      .section-title {
+        font-size: 28px;
+      }
+
+      table th, table td {
+        padding: 10px 8px;
+        font-size: 0.9rem;
+      }
+
+      .thumbnail {
+        width: 60px;
+        height: 60px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+    /* Mejoras para manejar texto largo y asegurar diseño responsive */
+
+/* Para la bitácora de entradas */
+.bitacora-entry {
+  /* Mantener las propiedades existentes */
+  background-color: #1C1C1C;
+  border-radius: 8px;
+  padding: 25px;
+  border-left: 4px solid #e62429;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  animation: slideIn 0.5s ease-out;
+  margin-bottom: 15px;
+  
+  /* Agregar estas propiedades para manejar texto largo */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* Para el contenido de las entradas */
+.entry-content {
+  line-height: 1.8;
+  margin-bottom: 20px;
+  white-space: pre-line; /* Preserva saltos de línea */
+  color: #e6e6e6;
+  font-size: 1.05rem;
+  padding: 0 5px;
+  
+  /* Agregar estas propiedades para manejar texto largo */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Para las celdas de la tabla */
+table th, table td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid #444;
+  
+  /* Agregar estas propiedades para manejar texto largo */
+  max-width: 250px; /* Limitar ancho máximo */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow: hidden;
+}
+
+/* Asegurar que todas las imágenes se ajusten correctamente */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mejoras adicionales para mayor accesibilidad y diseño responsive */
+
+/* Mejorar el contraste de las categorías */
+.entry-category {
+  background-color: rgba(230, 36, 41, 0.3); /* Aumentado de 0.2 a 0.3 */
+  font-weight: 700; /* Aumentado de 600 a 700 */
+}
+
+/* Asegurar que los enlaces sean accesibles en dispositivos táctiles */
+.nav-link, button, .file-input-label {
+  padding: 12px 15px; /* Ligeramente más grande para área táctil */
+  min-height: 44px; /* Altura mínima para mejor accesibilidad táctil */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mejoras adicionales para responsive */
+@media (max-width: 576px) {
+  .entry-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .entry-category {
+    margin-top: 10px;
+  }
+  
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  table th, table td {
+    min-width: 120px; /* Asegura ancho mínimo en móviles */
+  }
+}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo-container">
+        <div class="header-logo">R0VER.M</div>
+        <div class="tagline">Bitácora del Proyecto</div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#" class="nav-link active" data-page="bitacora">Bitácora</a></li>
+          <li><a href="#" class="nav-link" data-page="datos">Datos</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div class="container">
+      <!-- Bitácora Section -->
+      <section id="bitacora" class="page-section active">
+        <h2 class="section-title">Bitácora de Proyecto</h2>
+        <div class="bitacora-entries" id="bitacoraEntries">
+          <!-- Entries will be dynamically loaded here -->
+          <div class="no-data" id="noBitacoraData">
+            No hay entradas en la bitácora. Agrega datos en la sección "Datos".
+          </div>
+        </div>
+      </section>
+
+      <!-- Datos Section -->
+      <section id="datos" class="page-section">
+        <h2 class="section-title">Gestión de Datos</h2>
+        
+        <form id="dataForm">
+          <div class="form-group">
+            <label for="title">Título:</label>
+            <input type="text" id="title" name="title" required placeholder="Título de la entrada">
+          </div>
+          
+          <div class="form-group">
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" placeholder="Describe la actividad o información"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="category">Categoría:</label>
+            <select id="category" name="category">
+              <option value="">Selecciona una categoría</option>
+              <option value="Sensor">Sensor</option>
+              <option value="Programación">Programación</option>
+              <option value="IOT">IoT</option>
+              <option value="Bases de Datos">Bases de Datos</option>
+              <option value="Inteligencia Artificial">Inteligencia Artificial</option>
+              <option value="Digital Twin">Digital Twin</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Imagen/Documento:</label>
+            <div class="file-input-container">
+              <label for="fileInput" class="file-input-label">Seleccionar archivo</label>
+              <input type="file" id="fileInput" name="fileInput" accept="image/*">
+              <div class="file-name" id="fileName">Ningún archivo seleccionado</div>
+            </div>
+          </div>
+          
+          <input type="hidden" id="entryId" name="entryId">
+          <input type="hidden" id="editMode" name="editMode" value="false">
+          
+          <button type="submit" id="submitBtn">Agregar Entrada</button>
+        </form>
+        
+        <h3 class="section-title">Registros de Datos</h3>
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Categoría</th>
+              <th>Fecha</th>
+              <th>Datos/Imagen</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data will be dynamically loaded here -->
+          </tbody>
+        </table>
+        <div class="no-data" id="noTableData">
+          No hay datos registrados.
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <div class="copyright">
+        © 2023 R0VER.M Sistema de Bitácora de Proyecto
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+  // Navigation
+  const navLinks = document.querySelectorAll('.nav-link');
+  const pageSections = document.querySelectorAll('.page-section');
+  
+  navLinks.forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+
+    const pageId = this.getAttribute('data-page');
+
+    // Si es la sección "datos", pedimos la contraseña
+    if (pageId === 'datos') {
+      const password = prompt('Ingresa la contraseña para acceder a la sección de datos:');
+
+      if (password !== 'admin123') {
+        alert('Contraseña incorrecta. Acceso denegado.');
+        return; // No continúa si la clave es incorrecta
+      }
+    }
+
+    // Activar el enlace
+    navLinks.forEach(l => l.classList.remove('active'));
+    this.classList.add('active');
+
+    // Mostrar la sección correspondiente
+    pageSections.forEach(section => {
+      section.classList.remove('active');
+      if (section.id === pageId) {
+        section.classList.add('active');
+      }
+    });
+  });
+});
+
+  
+  // File Input
+  const fileInput = document.getElementById('fileInput');
+  const fileName = document.getElementById('fileName');
+  
+  fileInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+    } else {
+      fileName.textContent = 'Ningún archivo seleccionado';
+    }
+  });
+  
+  // Data Management
+  const dataForm = document.getElementById('dataForm');
+  const dataTable = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+  const bitacoraEntries = document.getElementById('bitacoraEntries');
+  const noTableData = document.getElementById('noTableData');
+  const noBitacoraData = document.getElementById('noBitacoraData');
+  
+  // Cargar entradas desde la base de datos
+  let entries = [];
+  
+  function loadEntries() {
+    fetch('get_entries.php')
+      .then(response => {
+        console.log('Respuesta recibida:', response);
+        return response.json();
+      })
+      .then(data => {
+        console.log('Datos recibidos:', data);
+        entries = data.entries || data; // Compatibilidad con ambos formatos
+        updateTable();
+        updateBitacora();
+      })
+      .catch(error => {
+        console.error('Error al cargar entradas:', error);
+        alert('Error al cargar los datos. Consulta la consola para más detalles.');
+      });
+  }
+  
+  // Llamar a loadEntries al cargar la página
+  loadEntries();
+  
+  // Format date function
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    
+    return `${day}/${month}/${year} - ${hours}:${minutes}`;
+  }
+  
+  // Update UI functions
+  function updateTable() {
+    dataTable.innerHTML = '';
+    if (entries.length === 0) {
+      noTableData.style.display = 'block';
+    } else {
+      noTableData.style.display = 'none';
+      
+      entries.forEach((entry, index) => {
+        const row = dataTable.insertRow();
+        
+        const titleCell = row.insertCell(0);
+        titleCell.textContent = entry.title;
+        
+        const categoryCell = row.insertCell(1);
+        categoryCell.textContent = entry.category || 'Sin categoría';
+        
+        const dateCell = row.insertCell(2);
+        dateCell.textContent = formatDate(entry.date);
+        
+        const dataCell = row.insertCell(3);
+        if (entry.imageData) {
+          const img = document.createElement('img');
+          img.src = entry.imageData;
+          img.alt = entry.title;
+          img.classList.add('thumbnail');
+          dataCell.appendChild(img);
+        } else {
+          dataCell.textContent = 'Sin imagen';
+        }
+        
+        const actionsCell = row.insertCell(4);
+        actionsCell.classList.add('action-buttons');
+        
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Editar';
+        editBtn.classList.add('edit-btn');
+        editBtn.addEventListener('click', () => editEntry(index));
+        actionsCell.appendChild(editBtn);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Eliminar';
+        deleteBtn.classList.add('delete-btn');
+        deleteBtn.addEventListener('click', () => deleteEntry(index));
+        actionsCell.appendChild(deleteBtn);
+      });
+    }
+  }
+  
+  function updateBitacora() {
+    bitacoraEntries.innerHTML = '';
+    
+    if (entries.length === 0) {
+      noBitacoraData.style.display = 'block';
+    } else {
+      noBitacoraData.style.display = 'none';
+      
+      // Ordenar entradas por fecha (más recientes primero)
+      const sortedEntries = [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      sortedEntries.forEach(entry => {
+        const entryDiv = document.createElement('div');
+        entryDiv.classList.add('bitacora-entry');
+        
+        const headerDiv = document.createElement('div');
+        headerDiv.classList.add('entry-header');
+        
+        const titleDiv = document.createElement('div');
+        titleDiv.classList.add('entry-title');
+        titleDiv.textContent = entry.title;
+        
+        const dateDiv = document.createElement('div');
+        dateDiv.classList.add('entry-date');
+        dateDiv.textContent = formatDate(entry.date);
+        
+        headerDiv.appendChild(titleDiv);
+        headerDiv.appendChild(dateDiv);
+        
+        const categoryDiv = document.createElement('div');
+        categoryDiv.classList.add('entry-category');
+        categoryDiv.textContent = entry.category || 'Sin categoría';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('entry-content');
+        contentDiv.textContent = entry.description;
+        
+        entryDiv.appendChild(headerDiv);
+        entryDiv.appendChild(categoryDiv);
+        entryDiv.appendChild(contentDiv);
+        
+        // Añadir imagen si existe
+        if (entry.imageData) {
+          const mediaDiv = document.createElement('div');
+          mediaDiv.classList.add('entry-media');
+          
+          const img = document.createElement('img');
+          img.src = entry.imageData;
+          img.alt = entry.title;
+          
+          mediaDiv.appendChild(img);
+          entryDiv.appendChild(mediaDiv);
+        }
+        
+        bitacoraEntries.appendChild(entryDiv);
+      });
+    }
+  }
+  
+  // Función para editar una entrada
+  function editEntry(index) {
+    const entry = entries[index];
+    
+    // Llenar el formulario con los datos de la entrada
+    document.getElementById('title').value = entry.title;
+    document.getElementById('description').value = entry.description;
+    document.getElementById('category').value = entry.category || '';
+    document.getElementById('entryId').value = entry.id;
+    document.getElementById('editMode').value = 'true';
+    
+    // Cambiar el texto del botón
+    document.getElementById('submitBtn').textContent = 'Actualizar Entrada';
+    
+    // Mostrar la sección de datos
+    navLinks.forEach(l => l.classList.remove('active'));
+    document.querySelector('[data-page="datos"]').classList.add('active');
+    
+    pageSections.forEach(section => {
+      section.classList.remove('active');
+      if (section.id === 'datos') {
+        section.classList.add('active');
+      }
+    });
+    
+    // Scroll al formulario
+    dataForm.scrollIntoView({ behavior: 'smooth' });
+  }
+  
+  // Función para eliminar una entrada
+  function deleteEntry(index) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta entrada?')) {
+      const entry = entries[index];
+      
+      // Crear FormData para enviar el ID
+      const formData = new FormData();
+      formData.append('id', entry.id);
+      
+      fetch('delete_entry.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Recargar entradas
+          loadEntries();
+        } else {
+          alert('Error al eliminar: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error al eliminar la entrada');
+      });
+    }
+  }
+  
+  // Manejar envío del formulario
+  dataForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Crear FormData para enviar los datos
+    const formData = new FormData(this);
+    
+    // Mostrar indicador de carga
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.textContent;
+    submitBtn.innerHTML = '<span class="loading"></span> Guardando...';
+    submitBtn.disabled = true;
+    
+    fetch('save_entry.php', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Limpiar formulario
+        dataForm.reset();
+        fileName.textContent = 'Ningún archivo seleccionado';
+        document.getElementById('editMode').value = 'false';
+        document.getElementById('submitBtn').textContent = 'Agregar Entrada';
+        
+        // Recargar entradas
+        loadEntries();
+      } else {
+        alert('Error al guardar: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error al guardar la entrada');
+    })
+    .finally(() => {
+      // Restaurar botón
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    });
+  });
+});
+  </script>
+</body>
+</html>

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R0VER.M - Base de Datos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Bebas+Neue&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #ffffff;
+            background-color: #0a0a0a;
+            overflow-x: hidden;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            perspective: 1000px;
+        }
+
+        /* Dynamic background */
+        .dynamic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #0a1a2a 0%, #0a0a0a 100%);
+            z-index: -2;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #2c84cb;
+            z-index: 1000;
+            padding: 15px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .header-container, .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .header-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            color: #ff0000;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(44, 132, 203, 0.5);
+        }
+
+        .tagline {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            color: #0f9b8e;
+            letter-spacing: 1px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        nav li {
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-link {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 18px;
+            color: white;
+            text-decoration: none;
+            letter-spacing: 1px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #0f9b8e, #2c84cb);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::before {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: #2c84cb;
+            text-shadow: 0 0 5px rgba(44, 132, 203, 0.5);
+        }
+
+        .nav-link.active {
+            color: #2c84cb;
+            text-shadow: 0 0 10px rgba(44, 132, 203, 0.7);
+        }
+
+        .nav-link.active::before {
+            width: 100%;
+            box-shadow: 0 0 10px rgba(15, 155, 142, 0.7);
+        }
+
+        /* Main content */
+        .main-container {
+            padding: 120px 0 60px;
+            background-color: #0a0a0a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* Section title */
+        .section-title {
+            font-size: 48px;
+            color: #ffffff;
+            margin-bottom: 50px;
+            text-align: center;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.8s ease;
+        }
+
+        .section-title.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #0f9b8e, #2c84cb);
+            box-shadow: 0 0 15px rgba(44, 132, 203, 0.5);
+        }
+
+        /* Table Container Styling */
+        .table-container {
+            background-color: #1a1a1a;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 60px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid #2c84cb;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transform: translateY(50px);
+            opacity: 0;
+            display: none;
+        }
+
+        .table-container.visible {
+            transform: translateY(0);
+            opacity: 1;
+            display: block;
+        }
+
+        .table-container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(15, 155, 142, 0.3);
+        }
+
+        .table-title {
+            font-size: 28px;
+            margin-bottom: 25px;
+            color: #ffffff;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .table-container:hover .table-title {
+            color: #2c84cb;
+            text-shadow: 0 0 15px rgba(44, 132, 203, 0.7);
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead tr {
+            background: linear-gradient(90deg, #0f9b8e, #2c84cb);
+            color: #ffffff;
+            text-align: left;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+            background-color: #1d1d1d;
+        }
+
+        tbody tr:nth-of-type(even) {
+            background-color: #222222;
+        }
+
+        tbody tr:hover {
+            background-color: #2a2a2a;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(44, 132, 203, 0.2);
+        }
+
+        /* Floating elements */
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(15, 155, 142, 0.1), rgba(44, 132, 203, 0.1));
+            border-radius: 50%;
+            filter: blur(20px);
+            animation: float 15s infinite linear;
+        }
+
+        /* Status indicators */
+        .status-high {
+            color: #ff5252;
+            font-weight: bold;
+        }
+
+        .status-medium {
+            color: #ffb142;
+            font-weight: bold;
+        }
+
+        .status-low {
+            color: #2ed573;
+            font-weight: bold;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 1024px) {
+            .section-title {
+                font-size: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 32px;
+            }
+            
+            th, td {
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            .table-title {
+                font-size: 24px;
+            }
+            
+            .header-logo {
+                font-size: 20px;
+            }
+            
+            .tagline {
+                font-size: 12px;
+            }
+            
+            .nav-link {
+                padding: 8px 15px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .section-title {
+                font-size: 28px;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 12px;
+            }
+            
+            .table-container {
+                padding: 15px;
+            }
+            
+            .table-title {
+                font-size: 20px;
+            }
+            
+            .header-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .logo-container {
+                align-items: center;
+                margin-bottom: 10px;
+            }
+            
+            nav ul {
+                gap: 5px;
+            }
+            
+            .nav-link {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dynamic-bg"></div>
+    <div class="particles" id="particles-js"></div>
+    
+    <!-- Barra de navegación -->
+    <header class="navbar">
+        <div class="header-container nav-container">
+            <div class="logo-container">
+                <div class="header-logo">R0VER.M</div>
+               
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="nav-link active" id="obstaculos-btn">Obstáculos</a></li>
+                    <li><a href="#" class="nav-link" id="sensores-btn">Sensores</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <div class="floating-elements" id="floating-elements"></div>
+        <div class="content-wrapper">
+            <h1 class="section-title" id="section-title">Base de Datos </h1>
+            
+            <!-- Primera tabla: Solo tiempo y obstáculos -->
+            <div class="table-container visible" id="table1">
+                <h2 class="table-title">Registro de Obstáculos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tiempo (fecha y hora)</th>
+                            <th>Obstáculos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="obstaculos-data">
+                        <!-- Las filas se llenarán con datos de la hoja de cálculo -->
+                        <tr>
+                            <td colspan="2">Cargando datos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Segunda tabla: Tiempo, GPS, Mina, Metal, Pólvora, Tipo -->
+            <div class="table-container" id="table2">
+                <h2 class="table-title">Registro de Sensores y Minas</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tiempo (fecha y hora)</th>
+                            <th>GPS</th>
+                            <th>Mina</th>
+                            <th>Metal</th>
+                            <th>Pólvora</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sensores-data">
+                        <!-- Las filas se llenarán con datos de la hoja de cálculo -->
+                        <tr>
+                            <td colspan="6">Cargando datos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // URL directa proporcionada por el usuario
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRMSGHq3hm1M-BJcqOlFMEQ0TjOW2gbDvEB0Mz6l7ocPmRH2fonMGvzkk54Dc5XQ0QA-mAbhDfirzbb/pub?output=csv';
+        
+        // Referencias a los botones y tablas
+        const obstaculosBtn = document.getElementById('obstaculos-btn');
+        const sensoresBtn = document.getElementById('sensores-btn');
+        const table1 = document.getElementById('table1');
+        const table2 = document.getElementById('table2');
+        
+        // Funcionalidad de los botones
+        obstaculosBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            table1.classList.add('visible');
+            table2.classList.remove('visible');
+            obstaculosBtn.classList.add('active');
+            sensoresBtn.classList.remove('active');
+        });
+        
+        sensoresBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            table1.classList.remove('visible');
+            table2.classList.add('visible');
+            obstaculosBtn.classList.remove('active');
+            sensoresBtn.classList.add('active');
+        });
+        
+        // Obtener datos para ambas tablas
+        fetch(sheetUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta de la red: ' + response.status);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log("Datos recibidos:", data.substring(0, 100)); // Log para depuración
+                const rows = parseCSV(data);
+                
+                // Mostrar los encabezados en la consola para depuración
+                console.log("Encabezados:", rows[0]);
+                
+                // Mapear las columnas correctamente para la primera tabla (Obstáculos)
+                const obstaculosRows = rows.map(row => {
+                    // Ajusta estos índices según la estructura real de tu hoja
+                    return [row[0], row[3]]; // Marca temporal y Obstáculos
+                });
+                
+                populateTable('obstaculos-data', obstaculosRows, 2);
+                
+                // Mapear las columnas correctamente para la segunda tabla (Sensores y Minas)
+                const sensoresRows = rows.map(row => {
+                    // Ajusta estos índices según la estructura real de tu hoja
+                    return [
+                        row[0],  // Marca temporal
+                        row[2],  // GPS
+                        row[6],  // Mina
+                        row[5],  // Metal
+                        row[4],  // Pólvora
+                        row[7]   // Tipo
+                    ];
+                });
+                
+                populateTable('sensores-data', sensoresRows, 6);
+            })
+            .catch(error => {
+                console.error('Error al obtener datos:', error);
+                document.getElementById('obstaculos-data').innerHTML = 
+                    '<tr><td colspan="2">Error al cargar los datos: ' + error.message + '</td></tr>';
+                document.getElementById('sensores-data').innerHTML = 
+                    '<tr><td colspan="6">Error al cargar los datos: ' + error.message + '</td></tr>';
+            });
+            
+        // Función para analizar datos CSV
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            return lines.map(line => {
+                // Manejar comas dentro de campos entre comillas
+                let inQuotes = false;
+                let currentField = '';
+                let fields = [];
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        fields.push(currentField);
+                        currentField = '';
+                    } else {
+                        currentField += char;
+                    }
+                }
+                
+                fields.push(currentField); // Añadir el último campo
+                return fields;
+            }).filter(row => row.some(field => field.trim() !== '')); // Eliminar filas vacías
+        }
+        
+        // Función para llenar la tabla con datos
+        function populateTable(tableId, rows, columnCount) {
+            if (rows.length <= 1) { // Solo encabezado o vacío
+                document.getElementById(tableId).innerHTML = 
+                    `<tr><td colspan="${columnCount}">No hay datos disponibles</td></tr>`;
+                return;
+            }
+            
+            // Omitir la fila de encabezado (fila 0) y usar filas de datos
+            const tableRows = rows.slice(1).map(row => {
+                // Crear clases de estado para ciertas columnas si es necesario
+                let rowHtml = '<tr>';
+                
+                // Añadir cada celda con el formato apropiado
+                for (let i = 0; i < columnCount; i++) {
+                    const cellValue = row[i] || '';
+                    
+                    // Añadir clases de estado para columnas específicas si es necesario
+                    let cellClass = '';
+                    if (tableId === 'sensores-data') {
+                        // Añadir clases de estado a la columna "Mina" (índice 2)
+                        if (i === 2) {
+                            if (cellValue.toLowerCase().includes('si')) {
+                                cellClass = 'class="status-high"';
+                            } else if (cellValue.toLowerCase().includes('posible')) {
+                                cellClass = 'class="status-medium"';
+                            } else if (cellValue.toLowerCase().includes('no')) {
+                                cellClass = 'class="status-low"';
+                            }
+                        }
+                    }
+                    
+                    rowHtml += `<td ${cellClass}>${cellValue}</td>`;
+                }
+                
+                rowHtml += '</tr>';
+                return rowHtml;
+            }).join('');
+            
+            document.getElementById(tableId).innerHTML = tableRows || 
+                `<tr><td colspan="${columnCount}">No hay datos disponibles</td></tr>`;
+        }
+
+        // Configuración de Particles.js
+        particlesJS('particles-js', {
+            "particles": {
+                "number": {
+                    "value": 80,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": ["#2c84cb", "#0f9b8e"]
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 5
+                    }
+                },
+                "opacity": {
+                    "value": 0.3,
+                    "random": true,
+                    "anim": {
+                        "enable": true,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": true,
+                        "speed": 2,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#2c84cb",
+                    "opacity": 0.2,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 1,
+                    "direction": "none",
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": true,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "grab"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 140,
+                        "line_linked": {
+                            "opacity": 0.5
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+
+        // Crear elementos flotantes
+        const floatingContainer = document.getElementById('floating-elements');
+        for (let i = 0; i < 15; i++) {
+            const element = document.createElement('div');
+            element.classList.add('floating-element');
+            const size = Math.random() * 100 + 50;
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            const opacity = Math.random() * 0.2 + 0.1;
+            const delay = Math.random() * 15;
+            
+            element.style.width = `${size}px`;
+            element.style.height = `${size}px`;
+            element.style.left = `${posX}%`;
+            element.style.top = `${posY}%`;
+            element.style.opacity = opacity;
+            element.style.animationDelay = `${delay}s`;
+            
+            floatingContainer.appendChild(element);
+        }
+
+        // Animaciones de desplazamiento
+        function checkVisibility() {
+            const sectionTitle = document.getElementById('section-title');
+            
+            const elements = [
+                { el: sectionTitle, class: 'visible' }
+            ];
+            
+            elements.forEach(item => {
+                const rect = item.el.getBoundingClientRect();
+                const isVisible = (rect.top <= window.innerHeight * 0.8) && 
+                                (rect.bottom >= window.innerHeight * 0.2);
+                
+                if (isVisible) {
+                    item.el.classList.add(item.class);
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', function() {
+            checkVisibility();
+        });
+        
+        // Verificación inicial
+        setTimeout(checkVisibility, 100);
+    });
+    </script>
+</body>
+</html>

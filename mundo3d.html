@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>R0VER 3D Viewer</title>
+  <style>
+    /* ... mismo CSS que antes ... */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      background: linear-gradient(135deg, #000000, #1a2a3d, #323232);
+      color: #ffffff;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(45deg, rgba(30, 40, 30, 0.05) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(30, 40, 30, 0.05) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(30, 40, 30, 0.05) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(30, 40, 30, 0.05) 75%);
+      background-size: 60px 60px;
+      z-index: -1;
+      opacity: 0.15;
+    }
+    header {
+      background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
+      padding: 15px 0;
+      text-align: center;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      z-index: 100;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+    .header-logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ff0000;
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+      font-family: 'Arial Black', sans-serif;
+    }
+    .tagline {
+      font-size: 14px;
+      font-style: italic;
+      color: #cccccc;
+    }
+    #viewer {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      top: 70px;
+    }
+    canvas { display: block; }
+    
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff0000;
+      font-size: 18px;
+      text-align: center;
+      z-index: 10;
+    }
+    
+    .error {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff4444;
+      font-size: 16px;
+      text-align: center;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ff4444;
+    }
+    
+    .controls-info {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      color: #cccccc;
+      backdrop-filter: blur(5px);
+    }
+    .back-button {
+  position: fixed;
+  top: 90px;
+  left: 20px;
+  background: #ff0000;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+  z-index: 999;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.back-button:hover {
+  background: #cc0000;
+  transform: scale(1.05);
+}
+
+  </style>
+</head>
+<body>
+  <header>
+     <a href="index.html" class="back-button">⏪ Volver al Inicio</a>
+   <div class="header-logo">R0VER</div>
+    <div class="tagline">Exploración segura y precisa</div>
+
+  </header>
+
+  <div id="viewer">
+    <div class="loading" id="loading">Cargando modelo R0VER...</div>
+    <div class="error" id="error" style="display: none;">
+      <h3>Error al cargar el modelo</h3>
+      <p>No se pudo encontrar el archivo: <strong>modelo/R0VER_MODEL.glb</strong></p>
+      <p>Asegúrate de que:</p>
+      <ul style="text-align: left; margin-top: 10px;">
+        <li>El archivo existe en la carpeta 'modelo/'</li>
+        <li>El nombre del archivo es exactamente 'R0VER_MODEL.glb'</li>
+        <li>El servidor web está funcionando correctamente</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="controls-info">
+    <div>🖱️ Click y arrastra: Rotar</div>
+    <div>🔍 Scroll: Zoom</div>
+    <div>⌨️ Shift + Click y arrastra: Pan</div>
+  </div>
+
+  <!-- THREE.js y GLTFLoader -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- OrbitControls -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <script>
+    // Escena y cámara
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(3, 2, 5);
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.getElementById('viewer').appendChild(renderer.domElement);
+
+    // OrbitControls para cámara
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 0, 0);
+    controls.enableDamping = true; // suavizado
+    controls.dampingFactor = 0.05;
+    controls.screenSpacePanning = false; // pan solo lateral y vertical
+    controls.minDistance = 2;  // zoom mínimo
+    controls.maxDistance = 20; // zoom máximo
+    controls.maxPolarAngle = Math.PI / 2; // limitar rotación vertical (no pasar debajo)
+
+    // Luz ambiental y direccional
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+    scene.add(ambientLight);
+
+    const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x222222, 1);
+    scene.add(hemisphereLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 10, 7.5);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    scene.add(directionalLight);
+
+    // Suelo para referencia
+    const groundGeometry = new THREE.PlaneGeometry(20, 20);
+    const groundMaterial = new THREE.MeshPhongMaterial({ 
+      color: 0x2a2a2a,
+      transparent: true,
+      opacity: 0.3
+    });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -1.5;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Modelo cargado
+    let loadedModel = null;
+
+    // Cargar GLTF
+    const loader = new THREE.GLTFLoader();
+    loader.load(
+      'modelo/R0VER_MODEL.glb',
+      function (gltf) {
+        loadedModel = gltf.scene;
+        loadedModel.scale.set(2, 2, 2);
+        loadedModel.position.set(0, -1, 0);
+        loadedModel.traverse(child => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        scene.add(loadedModel);
+        document.getElementById('loading').style.display = 'none';
+      },
+      function (xhr) {
+        // progreso opcional
+      },
+      function (error) {
+        console.error(error);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+      }
+    );
+
+    // Animación
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Ajuste de tamaño
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

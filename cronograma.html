@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planificador de Proyecto - Spider Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #1C1C1C;
+      color: #FFFFFF;
+      padding: 40px;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/white-diamond.png');
+      opacity: 0.03;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      max-width: 960px;
+      margin: auto;
+      background-color: #000000;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(237, 29, 36, 0.5);
+      padding: 40px;
+      z-index: 1;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      color: #ED1D24;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    form {
+      background-color: #1C1C1C;
+      padding: 25px 30px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: 700;
+      color: #ED1D24;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background-color: #000000;
+      color: #FFFFFF;
+      font-size: 1rem;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      background-color: #ED1D24;
+      color: #FFFFFF;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #B71C1C;
+      transform: scale(1.05);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .button-group button {
+      flex: 1;
+    }
+
+    .json-button {
+      background-color: #4CAF50;
+    }
+
+    .json-button:hover {
+      background-color: #3e8e41;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #1C1C1C;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    table th, table td {
+      padding: 14px;
+      text-align: center;
+      border-bottom: 1px solid #444;
+    }
+
+    table th {
+      background-color: #ED1D24;
+      color: #FFFFFF;
+      font-weight: bold;
+    }
+
+    table td {
+      color: #FFFFFF;
+    }
+
+    .borrar {
+      background-color: #ED1D24;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .borrar:hover {
+      background-color: #B71C1C;
+      transform: scale(1.05);
+    }
+
+    @keyframes aparecer {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .fila-animada {
+      animation: aparecer 0.3s ease-out;
+    }
+
+    #fileInput {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Planificador de Proyecto</h1>
+    <form id="projectForm">
+      <label for="stage">Etapa:</label>
+      <select id="stage" name="stage" required>
+        <option value="">Selecciona una etapa</option>
+        <option value="Sensor">Sensor</option>
+        <option value="Programación">Programación</option>
+        <option value="IOT">IoT</option>
+        <option value="Bases de Datos">Bases de Datos</option>
+        <option value="Inteligencia Artificial">Inteligencia Artificial</option>
+        <option value="Digital Twin">Digital Twin</option>
+      </select>
+
+      <label for="activity">Actividad:</label>
+      <input type="text" id="activity" name="activity" placeholder="Descripción de la actividad" required>
+
+      <label for="startDate">Fecha de Inicio:</label>
+      <input type="date" id="startDate" name="startDate" required>
+
+      <label for="endDate">Fecha de Fin:</label>
+      <input type="date" id="endDate" name="endDate" required>
+
+      <button type="submit">Agregar Actividad</button>
+      
+      <div class="button-group">
+        <button type="button" id="downloadJson" class="json-button">Descargar JSON</button>
+        <button type="button" id="loadJson" class="json-button">Cargar JSON</button>
+        <input type="file" id="fileInput" accept=".json">
+      </div>
+    </form>
+
+    <h2>Registro de Actividades</h2>
+    <table id="activitiesTable">
+      <thead>
+        <tr>
+          <th>Etapa</th>
+          <th>Actividad</th>
+          <th>Fecha de Inicio</th>
+          <th>Fecha de Fin</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Sonidos tipo cómic -->
+  <audio id="addSound" src="sounds/add.mp3" preload="auto"></audio>
+  <audio id="deleteSound" src="sounds/delete.mp3" preload="auto"></audio>
+  <audio id="jsonSound" src="sounds/json.mp3" preload="auto"></audio>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("projectForm");
+      const tableBody = document.getElementById("activitiesTable").getElementsByTagName("tbody")[0];
+      let activities = JSON.parse(localStorage.getItem("actividades")) || [];
+
+      const addSound = document.getElementById("addSound");
+      const deleteSound = document.getElementById("deleteSound");
+      const jsonSound = document.getElementById("jsonSound");
+      const downloadBtn = document.getElementById("downloadJson");
+      const loadBtn = document.getElementById("loadJson");
+      const fileInput = document.getElementById("fileInput");
+
+      function addRow(stage, activity, startDate, endDate) {
+        const row = tableBody.insertRow();
+        row.classList.add("fila-animada");
+
+        row.insertCell(0).textContent = stage;
+        row.insertCell(1).textContent = activity;
+        row.insertCell(2).textContent = startDate;
+        row.insertCell(3).textContent = endDate;
+
+        const deleteCell = row.insertCell(4);
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "❌";
+        deleteBtn.classList.add("borrar");
+        deleteBtn.onclick = () => {
+          const index = row.rowIndex - 1;
+          activities.splice(index, 1);
+          localStorage.setItem("actividades", JSON.stringify(activities));
+          tableBody.deleteRow(index);
+          deleteSound.play();
+        };
+        deleteCell.appendChild(deleteBtn);
+
+        addSound.play();
+      }
+
+      function refreshTable() {
+        tableBody.innerHTML = "";
+        activities.forEach(item => {
+          addRow(item.stage, item.activity, item.startDate, item.endDate);
+        });
+      }
+
+      // Cargar datos iniciales
+      refreshTable();
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const stage = document.getElementById("stage").value;
+        const activity = document.getElementById("activity").value;
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+
+        const newActivity = { stage, activity, startDate, endDate };
+        activities.push(newActivity);
+        localStorage.setItem("actividades", JSON.stringify(activities));
+
+        addRow(stage, activity, startDate, endDate);
+        form.reset();
+      });
+
+      // Descargar JSON
+      downloadBtn.addEventListener("click", function() {
+        const dataStr = JSON.stringify(activities, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = 'actividades_proyecto.json';
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+        
+        jsonSound.play();
+      });
+
+      // Cargar JSON
+      loadBtn.addEventListener("click", function() {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener("change", function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const jsonData = JSON.parse(e.target.result);
+            if (Array.isArray(jsonData)) {
+              activities = jsonData;
+              localStorage.setItem("actividades", JSON.stringify(activities));
+              refreshTable();
+              jsonSound.play();
+            } else {
+              alert("El archivo JSON no contiene un array válido de actividades");
+            }
+          } catch (error) {
+            alert("Error al leer el archivo JSON: " + error.message);
+          }
+        };
+        reader.readAsText(file);
+        fileInput.value = ""; // Resetear el input
+      });
+    });
+  </script>
+</body>
+</html>
